@@ -1,2 +1,0 @@
-# HydrokraftGLCpvtltd
-Website for hydrokraft 
