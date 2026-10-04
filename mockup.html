@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hydrokraft GLC Dealer Portal — Prototype</title>
+<style>
+:root{
+  --pri:#1D4F7C;--pri-d:#163D61;--pri-l:#E8F0F7;
+  --acc:#B45309;--acc-l:#F5B872;
+  --bg:#F3F5F8;--card:#FFFFFF;--line:#D8DEE6;--line-l:#E9EDF2;
+  --text:#18222E;--mut:#566373;--side:#12283D;
+  --ok:#1A7340;--ok-l:#E6F4EC;--warn:#8A5300;--warn-l:#FFF4DC;--bad:#B3261E;--bad-l:#FDECEA;
+  --vio:#5B3FA6;--vio-l:#EFEAFB;--teal:#0B6B74;--teal-l:#E0F3F5;--grey-l:#EEF1F5;
+  --r:6px;
+}
+*{box-sizing:border-box}
+html{font-size:14px}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--text);background:var(--bg);line-height:1.5}
+h1{font-size:22px;line-height:1.3;margin:0;font-weight:700}
+h2{font-size:16px;line-height:1.35;margin:0 0 12px;font-weight:600}
+h3{font-size:14px;margin:0 0 8px;font-weight:600}
+p{margin:0 0 12px}
+a{color:var(--pri);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:3px solid #F5B872;outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.mut{color:var(--mut)}.sm{font-size:12.5px}.b{font-weight:600}.r{text-align:right}.nw{white-space:nowrap}
+.sr{position:absolute;left:-9999px}
+.skip{position:absolute;left:-9999px;top:0;background:#fff;padding:8px 12px;z-index:100}
+.skip:focus{left:8px;top:8px}
+svg.ic{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 16px;border:1px solid var(--line);border-radius:var(--r);background:#fff;color:var(--text);font:inherit;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--grey-l);text-decoration:none}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.pri:hover{background:var(--pri-d)}
+.btn.danger{color:var(--bad);border-color:#E3B5B1}
+.btn.danger:hover{background:var(--bad-l)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--pri)}
+.btn.ghost:hover{background:var(--pri-l)}
+.btn.s{min-height:32px;padding:0 12px;font-size:13px}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+/* Shell */
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{background:var(--side);color:#C9D5E1;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;overflow:auto}
+.brand{padding:16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;gap:10px;align-items:center;color:#fff}
+.logo{width:34px;height:34px;border-radius:var(--r);background:linear-gradient(135deg,#DDE4EA,#8FA0B1);color:var(--side);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;flex:none}
+.brand b{display:block;font-size:14.5px;line-height:1.2}
+.brand span{font-size:12px;color:#9FB1C3}
+.nav{padding:12px 0;flex:1}
+.nav .grp{padding:8px 16px 4px;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:#8FA3B7}
+.nav a{display:flex;align-items:center;gap:10px;padding:10px 16px;color:#C9D5E1;border-left:3px solid transparent;font-weight:500}
+.nav a:hover{background:rgba(255,255,255,.06);color:#fff;text-decoration:none}
+.nav a.on{background:rgba(255,255,255,.1);color:#fff;border-left-color:var(--acc-l)}
+.nav .cnt{margin-left:auto;background:var(--acc);color:#fff;border-radius:10px;padding:0 7px;font-size:12px;font-weight:700;min-width:20px;text-align:center}
+.side .who{padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);font-size:12.5px}
+.side .who b{display:block;color:#fff;font-size:13.5px}
+.top{height:56px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:5}
+.top .area{font-weight:600}
+.top .sp{flex:1}
+.hamb{display:none}
+.page{padding:24px;max-width:1280px;margin:0 auto}
+.phd{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.phd .sub{color:var(--mut);margin:2px 0 0}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.crumb{font-size:12.5px;color:var(--mut);margin-bottom:8px}
+.crumb a{color:var(--mut)}.crumb span{margin:0 6px}
+
+/* Cards / grid */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.card.np{padding:0}
+.card .ch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line-l)}
+.card .ch h2{margin:0}
+.g2{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px;align-items:start}
+.g11{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;color:var(--text);display:block;border-top:3px solid var(--pri)}
+a.kpi:hover{text-decoration:none;border-color:var(--pri);background:var(--pri-l)}
+.kpi .v{font-size:26px;font-weight:700;line-height:1.2}
+.kpi .l{color:var(--mut);font-size:13px}
+.kpi .x{font-size:12.5px;color:var(--pri);margin-top:2px}
+.dl{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;margin:0}
+.dl dt{color:var(--mut)}.dl dd{margin:0;font-weight:500;overflow-wrap:anywhere}
+
+/* Tables */
+.tw{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+.t th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);font-weight:600;padding:10px 12px;background:#F8FAFC;border-bottom:1px solid var(--line);white-space:nowrap}
+.t td{padding:10px 12px;border-bottom:1px solid var(--line-l);vertical-align:middle}
+.t tr:last-child td{border-bottom:0}
+.t th.r,.t td.r{text-align:right}
+.t tr.lnk{cursor:pointer}
+.t tr.lnk:hover td{background:var(--pri-l)}
+.t tfoot td{background:#F8FAFC;font-weight:600}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:12px;font-size:12.5px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+.badge svg.ic{width:13px;height:13px;vertical-align:0}
+.s0{background:var(--grey-l);color:#3C4A5A;border-color:#CCD4DD}
+.s1{background:var(--pri-l);color:var(--pri);border-color:#B9CFE3}
+.s2{background:var(--warn-l);color:var(--warn);border-color:#EBD08F}
+.s3{background:var(--vio-l);color:var(--vio);border-color:#CFC3EE}
+.s4{background:var(--teal-l);color:var(--teal);border-color:#A9D9DE}
+.s5{background:var(--ok-l);color:var(--ok);border-color:#AED9BF}
+.sx{background:var(--bad-l);color:var(--bad);border-color:#F0BDB8}
+
+/* Forms */
+.field{margin-bottom:14px}
+.field label,.lab{display:block;font-weight:600;margin-bottom:4px;font-size:13.5px}
+.req{color:var(--bad)}.opt{color:var(--mut);font-weight:400}
+input[type=text],input[type=password],input[type=email],select,textarea{width:100%;min-height:38px;padding:7px 10px;border:1px solid #AEB8C4;border-radius:var(--r);font:inherit;color:var(--text);background:#fff}
+textarea{resize:vertical}
+input:hover,select:hover,textarea:hover{border-color:var(--pri)}
+input:focus,select:focus,textarea:focus{outline:3px solid #F5B872;outline-offset:1px;border-color:var(--pri)}
+input[readonly]{background:var(--grey-l);color:var(--mut)}
+.field.err input,.field.err select,.field.err textarea{border-color:var(--bad);background:#FFF8F7}
+.field .msg{color:var(--bad);font-size:12.5px;margin-top:4px;font-weight:600}
+.hint{color:var(--mut);font-size:12.5px;margin-top:4px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px}
+.chk{display:flex;gap:8px;align-items:flex-start;margin-bottom:12px;font-weight:500}
+.chk input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:var(--pri)}
+fieldset{border:0;padding:0;margin:0}
+legend{font-weight:600;font-size:15px;padding:0;margin-bottom:10px}
+.sect{border-top:1px solid var(--line-l);padding-top:16px;margin-top:6px}
+.upl{border:1.5px dashed #AEB8C4;border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#FAFBFC}
+
+/* Alerts */
+.alert{display:flex;gap:10px;padding:12px 14px;border-radius:var(--r);border:1px solid;margin-bottom:16px;align-items:flex-start}
+.alert svg.ic{margin-top:3px}
+.alert.info{background:var(--pri-l);border-color:#B9CFE3;color:#143A5C}
+.alert.ok{background:var(--ok-l);border-color:#AED9BF;color:#11512C}
+.alert.warn{background:var(--warn-l);border-color:#EBD08F;color:#5F3A00}
+.alert.bad{background:var(--bad-l);border-color:#F0BDB8;color:#7F1A14}
+.demo{border:1px dashed #9AA7B5;background:#FAFBFC;border-radius:var(--r);padding:12px;font-size:12.5px;color:var(--mut)}
+.demo b{color:var(--text)}
+
+/* Filters */
+.fbar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.fbar .field{margin:0;min-width:150px}
+.fbar .grow{flex:1;min-width:220px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:16px;padding:4px 12px;font:inherit;font-size:13px;cursor:pointer;color:var(--text);min-height:32px}
+.chip:hover{border-color:var(--pri)}
+.chip.on{background:var(--pri);border-color:var(--pri);color:#fff;font-weight:600}
+.chip .n{opacity:.75;margin-left:4px}
+
+/* Product */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.pc{background:#fff;border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column;color:var(--text);overflow:hidden}
+.pc:hover{border-color:var(--pri);box-shadow:0 2px 8px rgba(18,40,61,.1);text-decoration:none}
+.pc .bd{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pc .nm{font-weight:700;font-size:15px}
+.pc .price{font-size:19px;font-weight:700}
+.pc .specs{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;font-size:12.5px;color:var(--mut);border-top:1px solid var(--line-l);padding-top:8px;margin-top:2px}
+.pc .specs b{color:var(--text);font-weight:600}
+.ph{margin:0;background:repeating-linear-gradient(135deg,#EEF1F5,#EEF1F5 10px,#E6EAEF 10px,#E6EAEF 20px);display:flex;flex-direction:column;align-items:center;padding:14px 10px 8px;border-bottom:1px solid var(--line-l)}
+.ph svg{height:104px}
+.ph figcaption{font-size:11.5px;color:var(--mut);text-align:center;margin-top:6px;line-height:1.35}
+.ph.big{border:1px solid var(--line);border-radius:var(--r);padding:28px 16px 14px}
+.ph.big svg{height:260px}
+.ph.big figcaption{font-size:12.5px}
+.sw{display:inline-block;width:14px;height:14px;border-radius:50%;border:1px solid #7A8794;vertical-align:-2px}
+.cols{display:flex;gap:8px;flex-wrap:wrap}
+.colbtn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:var(--r);padding:6px 12px;font:inherit;cursor:pointer;min-height:36px;color:var(--text)}
+.colbtn:hover{border-color:var(--pri)}
+.colbtn.on{border-color:var(--pri);box-shadow:inset 0 0 0 1px var(--pri);background:var(--pri-l);font-weight:600}
+.qty{display:flex;gap:6px;align-items:center}
+.qty input{width:110px;text-align:center;font-weight:600;font-size:15px}
+.qty .btn{min-width:38px;padding:0 10px}
+.qin{width:90px!important;text-align:right}
+.pd{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px}
+.bigprice{font-size:28px;font-weight:700;line-height:1.2}
+
+/* Totals */
+.tot{display:grid;grid-template-columns:1fr auto;gap:6px 16px;margin:0}
+.tot dt{color:var(--mut)}.tot dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.tot .fin{font-weight:700;font-size:17px;color:var(--text);border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
+
+/* Tracker */
+.trk{display:flex;list-style:none;padding:0;margin:8px 0 0}
+.trk li{flex:1;text-align:center;position:relative;padding:0 4px}
+.trk li:before{content:"";position:absolute;top:15px;left:-50%;width:100%;height:3px;background:var(--line)}
+.trk li:first-child:before{display:none}
+.trk li.done:before,.trk li.cur:before{background:var(--ok)}
+.trk .dot{width:32px;height:32px;border-radius:50%;border:2px solid #AEB8C4;background:#fff;display:inline-flex;align-items:center;justify-content:center;position:relative;z-index:1;font-weight:700;color:var(--mut)}
+.trk .done .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.trk .cur .dot{background:var(--pri);border-color:var(--pri);color:#fff;box-shadow:0 0 0 4px #C9DBEB}
+.trk .lbl{display:block;font-weight:600;font-size:13px;margin-top:6px}
+.trk .todo .lbl{color:var(--mut);font-weight:500}
+.trk .dt{display:block;font-size:12px;color:var(--mut)}
+.trk .now{display:inline-block;margin-top:3px;background:var(--pri);color:#fff;border-radius:10px;padding:0 8px;font-size:11.5px;font-weight:600}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{position:relative;padding:0 0 14px 22px;border-left:2px solid var(--line);margin-left:6px}
+.tl li:last-child{border-left-color:transparent;padding-bottom:0}
+.tl li:before{content:"";position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--pri);border:2px solid #fff}
+.steps{display:flex;gap:8px;list-style:none;padding:0;margin:0 0 16px;flex-wrap:wrap}
+.steps li{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border:1px solid var(--line);border-radius:20px;background:#fff;color:var(--mut);font-weight:500}
+.steps li i{font-style:normal;width:24px;height:24px;border-radius:50%;background:var(--grey-l);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12.5px}
+.steps li.on{border-color:var(--pri);color:var(--pri);font-weight:700}
+.steps li.on i{background:var(--pri);color:#fff}
+.steps li.dn i{background:var(--ok);color:#fff}
+
+/* Empty */
+.empty{text-align:center;padding:40px 16px;color:var(--mut)}
+.empty .eico{width:56px;height:56px;border-radius:50%;background:var(--grey-l);display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px}
+.empty .eico svg{width:26px;height:26px}
+.empty h2{color:var(--text);margin-bottom:4px}
+
+/* Auth */
+.auth{min-height:100vh;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+.auth .left{background:var(--side);color:#C9D5E1;padding:48px 40px;display:flex;flex-direction:column;justify-content:space-between}
+.auth .left h2{color:#fff;font-size:26px;line-height:1.25;margin:28px 0 12px;font-weight:700}
+.auth .left ul{padding:0;list-style:none;margin:20px 0 0}
+.auth .left li{display:flex;gap:10px;margin-bottom:10px}
+.auth .right{padding:40px 24px;display:flex;justify-content:center;align-items:flex-start;overflow:auto}
+.abox{width:100%;max-width:440px;margin-top:4vh}
+.abox.wide{max-width:760px;margin-top:0}
+.abox h1{margin-bottom:4px}
+.big-ic{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.big-ic svg{width:30px;height:30px}
+.dbtns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.dbtns .btn{justify-content:flex-start;font-weight:500;font-size:12.5px;min-height:34px;padding:0 10px;overflow:hidden;text-overflow:ellipsis}
+
+/* Toast / modal */
+#toast{position:fixed;right:20px;bottom:20px;background:#12283D;color:#fff;padding:12px 16px;border-radius:var(--r);box-shadow:0 6px 20px rgba(0,0,0,.25);display:none;z-index:60;max-width:360px;font-weight:500}
+#modal{position:fixed;inset:0;background:rgba(18,34,46,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+#modal .mb{background:#fff;border-radius:var(--r);padding:20px;width:100%;max-width:480px;max-height:90vh;overflow:auto}
+.mfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+
+/* Responsive */
+@media(max-width:1000px){
+  .g2,.g11,.pd{grid-template-columns:1fr}
+  .g4{grid-template-columns:1fr 1fr}
+}
+@media(max-width:820px){
+  html{font-size:15px}
+  .shell{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;width:260px;z-index:30;transform:translateX(-100%);transition:transform .2s}
+  .shell.open .side{transform:none}
+  .shell.open:after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:20}
+  .hamb{display:inline-flex}
+  .top{padding:0 12px}.top .uname{display:none}
+  .page{padding:16px 12px}
+  .auth{grid-template-columns:1fr}
+  .auth .left{padding:20px 16px}.auth .left .hide-m{display:none}
+  .auth .right{padding:20px 12px}
+  .f2,.f3{grid-template-columns:1fr}
+  .trk{flex-direction:column;gap:0}
+  .trk li{display:grid;grid-template-columns:32px 1fr;column-gap:12px;text-align:left;padding:0 0 18px}
+  .trk li:before{left:15px;top:-100%;width:3px;height:100%}
+  .trk .dot{grid-row:1/4}
+  .trk .lbl{margin-top:4px}
+  .dl{grid-template-columns:1fr}.dl dt{margin-top:6px}
+  input[type=text],input[type=password],select,textarea{font-size:16px}
+  .dbtns{grid-template-columns:1fr}
+}
+@media(max-width:520px){.g4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal" role="dialog" aria-modal="true"><div class="mb" id="modalBody"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+/* ============ DATA ============ */
+const VER='hk1', TODAY='04 Oct 2026', CO='Hydrokraft GLC';
+const STAGES=['Order Placed','Confirmed','In Production','Ready for Dispatch','Dispatched','Delivered'];
+const AVAIL=['In Stock','Limited Stock','Made to Order','Out of Stock'];
+const COL={STL:['Steel Finish','#B9C0C7'],BLK:['Matte Black','#22262B'],BLU:['Midnight Blue','#1F3A6B'],RED:['Crimson Red','#A32027'],GRN:['Forest Green','#24583C'],WHT:['Pearl White','#EDEDE8'],PNK:['Coral Pink','#E27A7A'],YLW:['Sunny Yellow','#E5B52A']};
+const STATES=['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chandigarh','Chhattisgarh','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jammu & Kashmir','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Puducherry','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'];
+const PAYNOTE='Payment and commercial terms will be coordinated separately by our sales team.';
+let S, U={}, FM={}, ER={};
+
+function seed(){
+  S={user:null,cart:[],nextOrd:1049,nextDlr:1009,lastReg:null,resetEmail:''};
+  const pr=(id,name,sku,cap,wall,grade,colors,price,moq,carton,avail,stock,desc)=>({id,name,sku,cap,wall,grade,colors,price,gst:18,moq,carton,avail,stock,desc});
+  S.products=[
+    pr('p1','ThermoPro 500','DW-304-500',500,'Double Wall','SS 304',['STL','BLK','BLU'],345,48,24,'In Stock',null,'Vacuum-insulated bottle with a leak-proof screw cap. Keeps drinks hot for 12 hours and cold for 24 hours. Fits standard car cup holders.'),
+    pr('p2','ThermoPro 750','DW-304-750',750,'Double Wall','SS 304',['STL','BLK','BLU','RED'],425,48,24,'In Stock',null,'Our best-selling vacuum-insulated bottle. Powder-coated body, leak-proof screw cap with carry loop, hot 12 hours and cold 24 hours.'),
+    pr('p3','ThermoPro 1000','DW-304-1000',1000,'Double Wall','SS 304',['STL','BLK','GRN'],520,24,12,'Limited Stock',360,'One-litre vacuum-insulated bottle for travel and office use. Wide mouth for easy cleaning and ice cubes.'),
+    pr('p4','AquaLite 500','SW-304-500',500,'Single Wall','SS 304',['STL'],145,96,48,'In Stock',null,'Lightweight single-wall bottle for school and daily use. Mirror-polish steel finish with a steel screw cap and silicone seal.'),
+    pr('p5','AquaLite 750','SW-304-750',750,'Single Wall','SS 304',['STL','BLU'],175,96,48,'In Stock',null,'Everyday single-wall bottle with a slim grip. Suitable for refrigerator storage. Not insulated.'),
+    pr('p6','AquaLite 1000','SW-304-1000',1000,'Single Wall','SS 304',['STL'],210,72,36,'In Stock',null,'One-litre single-wall fridge bottle with a steel cap. A steady seller for household and gifting orders.'),
+    pr('p7','SportGrip 750','SW-304-750-SP',750,'Single Wall','SS 304',['STL','BLK','RED','GRN'],235,48,24,'Limited Stock',480,'Sports bottle with a flip-top sipper cap and textured grip band. Popular with gyms and school suppliers.'),
+    pr('p8','Summit Flask 1000','DW-304-1000-FL',1000,'Double Wall','SS 304',['STL','BLK'],640,24,12,'Made to Order',null,'Classic vacuum flask with a push-button stopper and a steel cup lid. Produced against confirmed orders; allow 15–20 working days.'),
+    pr('p9','JuniorSip 350','DW-304-350-KD',350,'Double Wall','SS 304',['BLU','PNK','YLW'],310,48,24,'Out of Stock',null,'Compact insulated bottle for children with a soft straw lid and carry strap. Next production batch is being scheduled.'),
+    pr('p10','EcoSteel 1000','SW-202-1000',1000,'Single Wall','SS 202',['STL'],165,72,36,'In Stock',null,'Economy one-litre fridge bottle in SS 202 steel. Built for price-sensitive retail counters and bulk institutional supply.')
+  ];
+  const dl=(n,biz,contact,mobile,email,gstin,pan,type,addr,city,state,pin,status,applied,decided,reason)=>({id:'D-'+n,biz,contact,mobile,email,gstin,pan,type,bill:addr,ship:addr,city,state,pin,status,applied,decided:decided||'',reason:reason||'',pwd:'Demo@123',doc:'GST_Certificate_'+biz.split(' ')[0]+'.pdf'});
+  S.dealers=[
+    dl(1001,'Sharma Housewares','Rajesh Sharma','9829045512','rajesh@sharmahousewares.in','08ABCFS4512K1Z6','ABCFS4512K','Dealer','Shop 14, Johari Bazaar Road','Jaipur','Rajasthan','302003','Approved','11 Mar 2026','12 Mar 2026'),
+    dl(1002,'Metro Gift Traders','Sneha Kulkarni','9822067731','sneha@metrogifttraders.in','27AAEFM7731P1Z3','AAEFM7731P','Wholesaler','212 Laxmi Road, Budhwar Peth','Pune','Maharashtra','411002','Approved','02 Apr 2026','04 Apr 2026'),
+    dl(1003,'Capital Kitchenware','Amit Bansal','9811034420','amit@capitalkitchenware.in','07AAACC4420L1Z9','AAACC4420L','Distributor','B-42, Sadar Bazaar','New Delhi','Delhi','110006','Approved','19 Feb 2026','20 Feb 2026'),
+    dl(1004,'Sunrise Distributors','Farhan Siddiqui','9839058846','farhan@sunrisedistributors.in','09AATFS8846R1Z1','AATFS8846R','Distributor','27 Aminabad Road','Lucknow','Uttar Pradesh','226018','Pending','02 Oct 2026'),
+    dl(1005,'Shree Balaji Steel Centre','Mahesh Patidar','9826071190','mahesh@balajisteelcentre.in','23AFKPP1190H1Z4','AFKPP1190H','Dealer','8 Bartan Bazaar, Rajwada','Indore','Madhya Pradesh','452002','Pending','01 Oct 2026'),
+    dl(1006,'Coastal Homeware Agencies','Anju Mathew','9847023365','anju@coastalhomeware.in','32AAGFC3365N1Z7','AAGFC3365N','Wholesaler','Door 41/208, Broadway','Kochi','Kerala','682031','Pending','29 Sep 2026'),
+    dl(1007,'Lakshmi Vessels & Gifts','Karthik Subramanian','9843019927','karthik@lakshmivessels.in','33AAHFL9927D1Z2','AAHFL9927D','Dealer','116 Oppanakara Street','Coimbatore','Tamil Nadu','641001','Rejected','22 Sep 2026','24 Sep 2026','The GSTIN on the uploaded certificate does not match the GSTIN entered in the application. Please upload the correct GST certificate.'),
+    dl(1008,'Greenleaf Lifestyle Stores','Divya Hegde','9845076618','divya@greenleafstores.in','29AAJCG6618M1Z5','AAJCG6618M','Dealer','73 Commercial Street','Bengaluru','Karnataka','560001','Approved','27 Sep 2026','30 Sep 2026')
+  ];
+  S.staff=[
+    {email:'admin@hydrokraftglc.in',pwd:'Demo@123',role:'admin',name:'Anita Desai',title:'Admin'},
+    {email:'sales@hydrokraftglc.in',pwd:'Demo@123',role:'sales',name:'Neha Kulkarni',title:'Sales Team'},
+    {email:'dispatch@hydrokraftglc.in',pwd:'Demo@123',role:'factory',name:'Imran Sheikh',title:'Factory / Dispatch'}
+  ];
+  const mk=(n,did,dates,items,x)=>{const d=D(did);x=x||{};return Object.assign({id:'ORD-'+n,dealerId:did,date:dates[0],items:items.map(a=>mkItem(a[0],a[1],a[2])),status:STAGES[dates.length-1],
+    hist:dates.map((dt,i)=>({s:STAGES[i],d:dt,by:i==0?(x.by||d.contact+' (Dealer)'):i==1?'Anita Desai (Admin)':'Imran Sheikh (Factory / Dispatch)',note:''})),
+    shipTo:addrOf(d,'ship'),po:'',notes:'',by:d.contact+' (Dealer)',dispatch:null,cancel:null,eta:''},x)};
+  S.orders=[
+    mk(1048,'D-1001',['02 Oct 2026'],[['p2','BLK',240],['p6','STL',360]],{po:'SH/PO/26-27/118'}),
+    mk(1046,'D-1002',['01 Oct 2026'],[['p1','BLU',144],['p7','RED',96]],{by:'Neha Kulkarni (Sales Team)',notes:'Order taken on phone from Ms. Kulkarni. Diwali gifting stock.'}),
+    mk(1045,'D-1003',['30 Sep 2026','01 Oct 2026'],[['p2','STL',480],['p4','STL',960],['p10','STL',720]],{eta:'Expected dispatch by 16 Oct 2026'}),
+    mk(1042,'D-1001',['26 Sep 2026','27 Sep 2026','29 Sep 2026'],[['p1','STL',192],['p5','BLU',288]],{eta:'Expected dispatch by 09 Oct 2026',po:'SH/PO/26-27/112'}),
+    mk(1039,'D-1002',['22 Sep 2026','23 Sep 2026','25 Sep 2026'],[['p8','BLK',120],['p2','RED',96]],{eta:'Expected dispatch by 14 Oct 2026'}),
+    mk(1036,'D-1003',['18 Sep 2026','19 Sep 2026','21 Sep 2026','02 Oct 2026'],[['p6','STL',720],['p3','GRN',120]]),
+    mk(1031,'D-1001',['12 Sep 2026','13 Sep 2026','15 Sep 2026','28 Sep 2026','30 Sep 2026'],[['p2','BLU',144],['p7','BLK',96]],{dispatch:{tr:'Girnar Roadways',lr:'GR-558213'},eta:'Expected delivery by 06 Oct 2026'}),
+    mk(1024,'D-1002',['03 Sep 2026','04 Sep 2026','06 Sep 2026','17 Sep 2026','18 Sep 2026','23 Sep 2026'],[['p4','STL',480],['p5','STL',288]],{dispatch:{tr:'Saurashtra Cargo Movers',lr:'SCM-204771'}}),
+    mk(1017,'D-1001',['21 Aug 2026','22 Aug 2026','24 Aug 2026','03 Sep 2026','04 Sep 2026','09 Sep 2026'],[['p2','BLK',192],['p1','BLK',96],['p6','STL',216]],{dispatch:{tr:'Girnar Roadways',lr:'GR-551876'}}),
+    mk(1011,'D-1003',['09 Aug 2026'],[['p9','PNK',240]],{status:'Cancelled',cancel:{reason:'JuniorSip 350 is out of stock and the next batch date is not confirmed. Dealer informed by phone.',d:'10 Aug 2026',by:'Anita Desai (Admin)'}})
+  ];
+}
+function mkItem(pid,c,q){const p=P(pid);return{pid,name:p.name,cap:p.cap,sku:p.sku+'-'+c,color:c,qty:q,price:p.price,gst:p.gst,carton:p.carton}}
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s);
+const P=id=>S.products.find(p=>p.id==id);
+const D=id=>S.dealers.find(d=>d.id==id);
+const O=id=>S.orders.find(o=>o.id==id);
+const me=()=>S.user&&S.user.role=='dealer'?D(S.user.id):null;
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inr=n=>{n=Math.round(n*100)/100;return '₹'+n.toLocaleString('en-IN',{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})};
+const nf=n=>Number(n).toLocaleString('en-IN');
+const capL=c=>c>=1000?(c/1000)+' litre':c+' ml';
+const addrOf=(d,k)=>d[k]+', '+d.city+', '+d.state+' – '+d.pin;
+const HOME={dealer:'/d/dashboard',admin:'/a/dashboard',sales:'/s/dashboard',factory:'/f/dashboard'};
+const PRE={dealer:'/d',admin:'/a',sales:'/s',factory:'/f'};
+function go(p){if(location.hash=='#'+p){ER={};render();window.scrollTo(0,0)}else location.hash=p}
+function save(){try{sessionStorage.setItem(VER,JSON.stringify(S))}catch(e){}}
+function load(){try{const v=sessionStorage.getItem(VER);if(v){S=JSON.parse(v);return true}}catch(e){}return false}
+function resetDemo(){seed();U={};FM={};ER={};save();toast('Demo data has been reset.');go('/login')}
+const IC={home:'M3 11l9-8 9 8M5 10v10h14V10',box:'M3 7l9-4 9 4v10l-9 4-9-4V7zM3 7l9 4 9-4M12 11v10',cart:'M3 4h2l3 12h10l3-8H7M9 20.5h.01M17 20.5h.01',list:'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',user:'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-4 4-6 8-6s8 2 8 6',users:'M9 11a4 4 0 100-8 4 4 0 000 8zM2 21c0-4 3-6 7-6s7 2 7 6M17 3.5a4 4 0 010 7.5M22 21c0-3-1.5-5-4-5.7',check:'M5 12l5 5L20 7',x:'M6 6l12 12M18 6L6 18',truck:'M1 6h13v10H1zM14 9h4l4 4v3h-8zM6 20a2 2 0 100-4 2 2 0 000 4zM18 20a2 2 0 100-4 2 2 0 000 4z',factory:'M3 21V10l6 4v-4l6 4V4h5v17H3z',search:'M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-5-5',plus:'M12 5v14M5 12h14',out:'M9 4H4v16h5M16 8l4 4-4 4M20 12H9',menu:'M3 6h18M3 12h18M3 18h18',alert:'M12 3l10 18H2L12 3zM12 10v5M12 18h.01',clock:'M12 21a9 9 0 100-18 9 9 0 000 18zM12 7v5l3 2',file:'M6 2h9l5 5v15H6zM14 2v6h6',info:'M12 21a9 9 0 100-18 9 9 0 000 18zM12 11v6M12 7h.01',edit:'M4 20h4L20 8l-4-4L4 16v4z',clip:'M9 4h6v3H9zM7 5H5v16h14V5h-2M9 12h6M9 16h6',half:'M12 21a9 9 0 100-18 9 9 0 000 18zM12 3v18',lock:'M6 11h12v10H6zM8 11V7a4 4 0 018 0v4'};
+const ic=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="${IC[n]}"/></svg>`;
+const SIC=['clock','check','factory','box','truck','check'];
+function badge(st){const i=STAGES.indexOf(st);return i<0?`<span class="badge sx">${ic('x')}${st}</span>`:`<span class="badge s${i}">${ic(SIC[i])}${st}</span>`}
+function avBadge(a){const m={'In Stock':['s5','check'],'Limited Stock':['s2','half'],'Made to Order':['s1','clock'],'Out of Stock':['sx','x']}[a];return `<span class="badge ${m[0]}">${ic(m[1])}${a}</span>`}
+function dBadge(s){const m={Approved:['s5','check'],Pending:['s2','clock'],Rejected:['sx','x']}[s];return `<span class="badge ${m[0]}">${ic(m[1])}${s=='Pending'?'Pending approval':s}</span>`}
+function sum(items){let sub=0,gst=0,pcs=0,ctn=0;const rates={};items.forEach(i=>{sub+=i.qty*i.price;gst+=i.qty*i.price*i.gst/100;pcs+=i.qty;ctn+=i.qty/i.carton;rates[i.gst]=1});const rk=Object.keys(rates);return{sub,gst,total:sub+gst,pcs,ctn:Math.ceil(ctn),rate:rk.length==1?' @ '+rk[0]+'%':''}}
+function totBox(t){return `<dl class="tot"><dt>Order subtotal (excl. GST)</dt><dd>${inr(t.sub)}</dd><dt>GST${t.rate}</dt><dd>${inr(t.gst)}</dd><dt class="fin">Final order value</dt><dd class="fin">${inr(t.total)}</dd></dl><p class="sm mut" style="margin:8px 0 0">${nf(t.pcs)} pieces · ${nf(t.ctn)} cartons. CGST + SGST or IGST will be shown on the tax invoice as applicable.</p>`}
+function qtyErr(p,q,already){q=String(q).trim();if(p.avail=='Out of Stock')return 'This product is out of stock and cannot be ordered right now.';if(!/^\d+$/.test(q)||+q<=0)return 'Enter the quantity in pieces, for example '+p.moq+'.';q=+q;if(q<p.moq)return `Minimum order quantity is ${p.moq} pieces.`;if(q%p.carton){const lo=Math.floor(q/p.carton)*p.carton;return `Order in full cartons of ${p.carton} pieces — try ${Math.max(lo,p.moq)} or ${lo+p.carton}.`}if(p.avail=='Limited Stock'&&q+(already||0)>p.stock)return `Only ${nf(p.stock)} pieces are available right now${already?' (you already have '+already+' in your order)':''}.`;return ''}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3800)}
+function modal(h){$('#modalBody').innerHTML=h;$('#modal').style.display='flex';const f=$('#modalBody').querySelector('textarea,input,button');if(f)f.focus()}
+function closeModal(){$('#modal').style.display='none'}
+document.addEventListener('keydown',e=>{if(e.key=='Escape')closeModal()});
+function fld(f,k,label,o){o=o||{};const m=FM[f]||(FM[f]={}),v=m[k]==null?'':m[k],e=(ER[f]||{})[k],id=f+'_'+k;
+  const at=`id="${id}" ${e?`aria-invalid="true" aria-describedby="${id}_e"`:''} ${o.ro?'readonly':''} ${o.ph?`placeholder="${o.ph}"`:''}`;
+  const on=`oninput="FM.${f}.${k}=this.value"`;let inp;
+  if(o.opts)inp=`<select ${at} onchange="FM.${f}.${k}=this.value"><option value="">Select…</option>${o.opts.map(x=>`<option ${x==v?'selected':''}>${x}</option>`).join('')}</select>`;
+  else if(o.area)inp=`<textarea ${at} rows="${o.rows||2}" ${on}>${esc(v)}</textarea>`;
+  else inp=`<input ${at} type="${o.type||'text'}" value="${esc(v)}" ${on} ${o.max?`maxlength="${o.max}"`:''} ${o.num?'inputmode="numeric"':''}>`;
+  return `<div class="field ${e?'err':''}"><label for="${id}">${label}${o.req?'<span class="req" aria-hidden="true"> *</span>':''}${o.opt?'<span class="opt"> (optional)</span>':''}</label>${inp}${o.hint?`<div class="hint">${o.hint}</div>`:''}${e?`<div class="msg" id="${id}_e">${ic('alert')} ${e}</div>`:''}</div>`}
+function head(t,sub,acts){return `<div class="phd"><div><h1>${t}</h1>${sub?`<p class="sub">${sub}</p>`:''}</div><div class="acts">${acts||''}</div></div>`}
+function crumb(a){return `<nav class="crumb" aria-label="Breadcrumb">${a.map(x=>x[1]?`<a href="#${x[1]}">${x[0]}</a>`:`<b>${x[0]}</b>`).join('<span>›</span>')}</nav>`}
+function kpi(l,v,x,href){return href?`<a class="kpi" href="#${href}"><div class="v num">${v}</div><div class="l">${l}</div><div class="x">${x||''}</div></a>`:`<div class="kpi"><div class="v num">${v}</div><div class="l">${l}</div><div class="x mut">${x||''}</div></div>`}
+function empty(icn,t,sub,btn){return `<div class="empty"><div class="eico">${ic(icn)}</div><h2>${t}</h2><p>${sub||''}</p>${btn||''}</div>`}
+function alertBox(kind,html){return `<div class="alert ${kind}" role="${kind=='bad'?'alert':'note'}">${ic(kind=='ok'?'check':kind=='info'?'info':'alert')}<div>${html}</div></div>`}
+function ph(p,c,big){const hex=(COL[c]||COL.STL)[1],h=p.cap<=350?96:p.cap<=500?112:p.cap<=750?128:140,y=150-h;
+  return `<figure class="ph ${big?'big':''}"><svg viewBox="0 0 60 150" aria-hidden="true"><rect x="${p.wall=='Double Wall'?19:21}" y="${y-22}" width="${p.wall=='Double Wall'?22:18}" height="14" rx="3" fill="#7F8B97"/><rect x="23" y="${y-8}" width="14" height="8" fill="#AAB3BC"/><path d="M13 ${y+12}c0-8 6-12 10-12h14c4 0 10 4 10 12v${h-24}c0 6-4 10-10 10H23c-6 0-10-4-10-10z" fill="${hex}" stroke="#6F7C89" stroke-width="1.2"/><rect x="18" y="${y+14}" width="5" height="${h-32}" rx="2.5" fill="#fff" opacity=".35"/></svg><figcaption>Photo placeholder: ${p.name} ${capL(p.cap)}, ${(COL[c]||COL.STL)[0]} — front view on white background</figcaption></figure>`}
+
+/* ============ SHELL ============ */
+function navFor(r){
+  if(r=='dealer')return[['dashboard','Dashboard','home'],['catalogue','Product Catalogue','box'],['cart','My Order','cart',S.cart.length],['orders','Orders','list'],['profile','Account','user']];
+  if(r=='admin')return[['dashboard','Dashboard','home'],['dealers','Dealers','users',S.dealers.filter(d=>d.status=='Pending').length],['products','Products','box'],['orders','Orders','list',S.orders.filter(o=>o.status=='Order Placed').length]];
+  if(r=='sales')return[['dashboard','Dashboard','home'],['new','Create Order','plus'],['dealers','Dealers','users'],['orders','Orders','list'],['products','Products','box']];
+  return[['dashboard','Production Queue','factory'],['requirements','Requirements','clip'],['completed','Completed','check']];
+}
+function shell(act,body){
+  const r=S.user.role,d=me(),st=S.staff.find(s=>s.email==S.user.id),nm=d?d.contact:st.name,sub=d?d.biz:st.title;
+  const area={dealer:'Dealer Portal',admin:'Admin',sales:'Sales Team',factory:'Factory / Dispatch'}[r];
+  return `<a class="skip" href="#main" onclick="document.getElementById('main').focus();return false">Skip to content</a>
+  <div class="shell ${U.menu?'open':''}" ${U.menu?'onclick="if(event.target===this){U.menu=false;render()}"':''}>
+  <aside class="side"><div class="brand"><div class="logo">H</div><div><b>${CO}</b><span>${area}</span></div></div>
+  <nav class="nav" aria-label="Main">${navFor(r).map(n=>`<a href="#${PRE[r]}/${n[0]}" class="${n[0]==act?'on':''}" ${n[0]==act?'aria-current="page"':''}>${ic(n[2])}${n[1]}${n[3]?`<span class="cnt">${n[3]}</span>`:''}</a>`).join('')}</nav>
+  <div class="who"><b>${esc(nm)}</b>${esc(sub)}</div></aside>
+  <div class="main"><header class="top"><button class="btn s hamb" aria-label="Open menu" onclick="U.menu=!U.menu;render()">${ic('menu')}</button><span class="area">${area}</span><span class="mut sm uname">· ${esc(sub)}</span><span class="sp"></span>
+  ${r=='dealer'?`<a class="btn s" href="#/d/cart">${ic('cart')}My Order${S.cart.length?` (${S.cart.length})`:''}</a>`:''}
+  <span class="uname sm">${esc(nm)}</span><button class="btn s" onclick="logout()">${ic('out')}Sign out</button></header>
+  <main class="page" id="main" tabindex="-1">${body}</main></div></div>`}
+function logout(){S.user=null;S.cart=[];U={};go('/login')}
+function auth(body,wide){return `<div class="auth"><div class="left"><div><div class="brand" style="padding:0;border:0"><div class="logo">H</div><div><b>${CO} Pvt Ltd</b><span>Stainless-steel bottles · Rajkot, Gujarat</span></div></div>
+  <h2>Dealer ordering portal</h2><p class="hide-m">For approved dealers, distributors and wholesalers.</p>
+  <ul class="hide-m"><li>${ic('check')}Standard dealer prices on the full bottle range</li><li>${ic('check')}Place bulk orders by the carton in minutes</li><li>${ic('check')}Track every order from placement to delivery</li></ul></div>
+  <p class="sm hide-m" style="margin:0;color:#8FA3B7">Sales desk: 0281-555-0142 · Mon–Sat, 9:30 am – 6:30 pm<br>Clickable prototype with invented sample data.</p></div>
+  <div class="right"><div class="abox ${wide?'wide':''}" id="main">${body}</div></div></div>`}
+const si=o=>STAGES.indexOf(o.status);
+const sortO=l=>l.slice().sort((a,b)=>+b.id.slice(4)-+a.id.slice(4));
+const myOrders=()=>sortO(S.orders.filter(o=>o.dealerId==S.user.id));
+const RX={mobile:/^[6-9]\d{9}$/,email:/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,gstin:/^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/,pan:/^[A-Z]{5}\d{4}[A-Z]$/,pin:/^\d{6}$/,pwd:/^(?=.*[A-Za-z])(?=.*\d).{8,}$/};
+
+/* ============ PUBLIC SCREENS ============ */
+function vLogin(){FM.login=FM.login||{};const e=(ER.login||{})._;
+  const db=(l,em)=>`<button type="button" class="btn s" onclick="demoLogin('${em}')">${l}</button>`;
+  return auth(`<h1>Sign in</h1><p class="mut">Use your registered email address and password.</p>
+  ${e?alertBox('bad','<b>Sign-in failed.</b> '+e):''}
+  <form onsubmit="return doLogin()" novalidate>${fld('login','email','Email address',{req:1})}${fld('login','pwd','Password',{type:'password',req:1})}
+  <button class="btn pri block" type="submit">Sign in</button></form>
+  <p style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:14px 0 24px"><a href="#/forgot">Forgot password?</a><a href="#/register">New dealer? Register your business</a></p>
+  <div class="demo"><b>Prototype shortcuts</b> — sign in as a sample user with one click. Password for every sample account: <b>Demo@123</b>
+  <div class="dbtns">${db('Dealer — Sharma Housewares','rajesh@sharmahousewares.in')}${db('Dealer — no orders yet','divya@greenleafstores.in')}${db('Dealer — pending approval','farhan@sunrisedistributors.in')}${db('Dealer — rejected','karthik@lakshmivessels.in')}${db('Admin','admin@hydrokraftglc.in')}${db('Sales Team','sales@hydrokraftglc.in')}${db('Factory / Dispatch','dispatch@hydrokraftglc.in')}<button type="button" class="btn s ghost" onclick="resetDemo()">Reset demo data</button></div></div>`)}
+function demoLogin(em){FM.login={email:em,pwd:'Demo@123'};doLogin()}
+function doLogin(){const f=FM.login,em=(f.email||'').trim().toLowerCase(),e={};
+  if(!em)e.email='Enter your email address.';if(!f.pwd)e.pwd='Enter your password.';
+  if(!e.email&&!e.pwd){const st=S.staff.find(s=>s.email==em&&s.pwd==f.pwd),d=S.dealers.find(d=>d.email.toLowerCase()==em&&d.pwd==f.pwd);
+    if(st){S.user={role:st.role,id:st.email};FM.login={};go(HOME[st.role]);return false}
+    if(d){S.user={role:'dealer',id:d.id};S.cart=[];FM.login={};go(d.status=='Approved'?HOME.dealer:'/status');return false}
+    e._='Incorrect email or password. Please check both and try again.';f.pwd=''}
+  ER.login=e;render();return false}
+
+function vRegister(){const f=FM.reg=FM.reg||{same:true},er=ER.reg||{},n=Object.keys(er).length;
+  return auth(`<p class="crumb"><a href="#/login">‹ Back to sign in</a></p><h1>${f.re?'Update and re-submit your application':'Register your business'}</h1>
+  <p class="mut">Dealer prices and ordering become available after ${CO} approves your application, usually within 2 working days. Fields marked <span class="req">*</span> are required.</p>
+  ${n?alertBox('bad',`<b>Please correct ${n} field${n>1?'s':''} highlighted below.</b> Your application has not been submitted yet.`):''}
+  <div class="demo" style="margin-bottom:16px"><b>Prototype shortcut</b> — <button type="button" class="btn s" onclick="fillReg()">Fill with sample details</button> or press “Submit application” with the form empty to see the error state.</div>
+  <form class="card" onsubmit="return doRegister()" novalidate>
+  <fieldset><legend>Business details</legend><div class="f2">${fld('reg','biz','Business name',{req:1})}${fld('reg','type','Business type',{req:1,opts:['Dealer','Distributor','Wholesaler']})}
+  ${fld('reg','gstin','GSTIN',{req:1,max:15,hint:'15 characters, e.g. 24ABCDE1234F1Z5'})}${fld('reg','pan','PAN',{opt:1,max:10,hint:'10 characters, e.g. ABCDE1234F'})}</div></fieldset>
+  <fieldset class="sect"><legend>Contact person</legend><div class="f3">${fld('reg','contact','Contact person name',{req:1})}${fld('reg','mobile','Mobile number',{req:1,max:10,num:1,hint:'10-digit mobile number'})}${fld('reg','email','Email address',{req:1,hint:'You will sign in with this email'})}</div></fieldset>
+  <fieldset class="sect"><legend>Addresses</legend>${fld('reg','bill','Billing address',{req:1,area:1,hint:'Building, street and area'})}
+  <label class="chk"><input type="checkbox" ${f.same?'checked':''} onchange="FM.reg.same=this.checked;render()">Shipping address is the same as billing address</label>
+  ${f.same?'':fld('reg','ship','Shipping address',{req:1,area:1})}
+  <div class="f3">${fld('reg','city','City',{req:1})}${fld('reg','state','State',{req:1,opts:STATES})}${fld('reg','pin','PIN code',{req:1,max:6,num:1})}</div></fieldset>
+  <fieldset class="sect"><legend>Business proof</legend><div class="field ${er.doc?'err':''}"><span class="lab">GST certificate or other business proof<span class="req"> *</span></span>
+  <div class="upl">${f.doc?`${ic('file')}<b>${esc(f.doc)}</b><span class="mut sm">248 KB · attached</span><button type="button" class="btn s ghost" onclick="FM.reg.doc='';render()">Remove</button>`:`<button type="button" class="btn s" id="reg_doc" onclick="FM.reg.doc='GST_Certificate.pdf';render()">${ic('plus')}Choose file</button><span class="mut sm">PDF, JPG or PNG, up to 5 MB. (In this prototype, clicking attaches a sample file.)</span>`}</div>
+  ${er.doc?`<div class="msg">${ic('alert')} ${er.doc}</div>`:''}</div></fieldset>
+  <fieldset class="sect"><legend>Create password</legend><div class="f2">${fld('reg','pwd','Password',{req:1,type:'password',hint:'At least 8 characters, with a letter and a number'})}${fld('reg','pwd2','Confirm password',{req:1,type:'password'})}</div></fieldset>
+  <div class="acts sect"><button class="btn pri" type="submit">Submit application</button><a class="btn" href="#/login">Cancel</a></div></form>`,1)}
+function fillReg(){FM.reg=Object.assign({},FM.reg,{biz:'Aravali Home Essentials',type:'Distributor',gstin:'08AAMFA2764Q1Z8',pan:'AAMFA2764Q',contact:'Vikram Rathore',mobile:'9414063382',email:'vikram@aravalihome.in',bill:'Plot 22, Mandore Industrial Area',same:true,city:'Jodhpur',state:'Rajasthan',pin:'342007',doc:'GST_Certificate_Aravali.pdf',pwd:'Demo@123',pwd2:'Demo@123'});ER={};render()}
+function doRegister(){const f=FM.reg,e={},t=k=>(f[k]||'').trim();
+  f.gstin=t('gstin').toUpperCase();f.pan=t('pan').toUpperCase();
+  if(t('biz').length<3)e.biz='Enter your business name (at least 3 characters).';
+  if(!f.type)e.type='Select your business type.';
+  if(!f.gstin)e.gstin='Enter your GSTIN.';else if(!RX.gstin.test(f.gstin))e.gstin='This does not look like a valid GSTIN. It should be 15 characters, e.g. 24ABCDE1234F1Z5.';else if(S.dealers.some(d=>d.gstin==f.gstin&&d.id!=f.re))e.gstin='A business with this GSTIN is already registered. Please sign in or contact our sales desk.';
+  if(f.pan&&!RX.pan.test(f.pan))e.pan='PAN should be 10 characters, e.g. ABCDE1234F. Leave it blank if you do not want to provide it.';
+  if(!t('contact'))e.contact='Enter the contact person’s name.';
+  if(!RX.mobile.test(t('mobile')))e.mobile='Enter a valid 10-digit mobile number.';
+  if(!RX.email.test(t('email')))e.email='Enter a valid email address, e.g. name@business.in.';else if(S.dealers.some(d=>d.email.toLowerCase()==t('email').toLowerCase()&&d.id!=f.re)||S.staff.some(s=>s.email==t('email').toLowerCase()))e.email='This email address is already registered. Try signing in instead.';
+  if(!t('bill'))e.bill='Enter your billing address.';
+  if(!f.same&&!t('ship'))e.ship='Enter your shipping address, or tick “same as billing address”.';
+  if(!t('city'))e.city='Enter your city.';if(!f.state)e.state='Select your state.';
+  if(!RX.pin.test(t('pin')))e.pin='Enter a 6-digit PIN code.';
+  if(!f.doc)e.doc='Attach your GST certificate or another business proof.';
+  if(!RX.pwd.test(f.pwd||''))e.pwd='Password must be at least 8 characters and include a letter and a number.';
+  if((f.pwd2||'')!==(f.pwd||'')||!f.pwd2)e.pwd2='The two passwords do not match.';
+  if(Object.keys(e).length){ER.reg=e;render();window.scrollTo(0,0);return false}
+  const rec={biz:t('biz'),type:f.type,gstin:f.gstin,pan:f.pan,contact:t('contact'),mobile:t('mobile'),email:t('email').toLowerCase(),bill:t('bill'),ship:f.same?t('bill'):t('ship'),city:t('city'),state:f.state,pin:t('pin'),doc:f.doc,pwd:f.pwd,status:'Pending',applied:TODAY,decided:'',reason:''};
+  let d=f.re&&D(f.re);if(d)Object.assign(d,rec);else{d=Object.assign({id:'D-'+S.nextDlr++},rec);S.dealers.push(d)}
+  S.lastReg=d.id;S.user=null;FM.reg=null;go('/register/submitted');return false}
+function vRegDone(){const d=D(S.lastReg);if(!d){go('/login');return null}
+  return auth(`<div class="big-ic" style="background:var(--ok-l);color:var(--ok)">${ic('check')}</div><h1>Application submitted</h1>
+  <p class="mut">Thank you, ${esc(d.contact)}. We have received the registration for <b>${esc(d.biz)}</b>.</p>
+  <div class="card"><dl class="dl"><dt>Application reference</dt><dd>${d.id}</dd><dt>Submitted on</dt><dd>${d.applied}</dd><dt>Status</dt><dd>${dBadge('Pending')}</dd><dt>Sign-in email</dt><dd>${esc(d.email)}</dd></dl></div>
+  ${alertBox('info','<b>What happens next?</b> Our team will check your GST details, usually within 2 working days. Dealer prices and ordering will open as soon as your application is approved. You can sign in at any time to check the status.')}
+  <div class="acts"><button class="btn pri" onclick="S.user={role:'dealer',id:'${d.id}'};go('/status')">Check application status</button><a class="btn" href="#/login">Back to sign in</a></div>`)}
+function vStatus(){const d=me();if(d.status=='Approved'){go(HOME.dealer);return null}
+  const pend=d.status=='Pending';
+  return auth(`${pend?`<div class="big-ic" style="background:var(--warn-l);color:var(--warn)">${ic('clock')}</div><h1>Your application is awaiting approval</h1>
+  <p class="mut">${esc(d.biz)} · Reference ${d.id}</p>
+  <ol class="steps"><li class="dn"><i>${ic('check')}</i>Submitted ${d.applied}</li><li class="on"><i>2</i>Under review</li><li><i>3</i>Decision</li></ol>
+  ${alertBox('warn','<b>Dealer prices and ordering are not available yet.</b> They will open automatically once '+CO+' approves your application. Reviews usually take up to 2 working days.')}`
+  :`<div class="big-ic" style="background:var(--bad-l);color:var(--bad)">${ic('x')}</div><h1>Your application was not approved</h1>
+  <p class="mut">${esc(d.biz)} · Reference ${d.id} · Reviewed on ${d.decided}</p>
+  ${alertBox('bad','<b>Reason given by our team:</b><br>'+esc(d.reason))}
+  <p>You can correct your details and submit the application again. If you believe this is a mistake, please call our sales desk.</p>`}
+  <div class="card"><h2>Your submitted details</h2><dl class="dl"><dt>Business name</dt><dd>${esc(d.biz)}</dd><dt>Business type</dt><dd>${d.type}</dd><dt>GSTIN</dt><dd>${d.gstin}</dd><dt>Contact</dt><dd>${esc(d.contact)} · ${d.mobile}</dd><dt>Address</dt><dd>${esc(addrOf(d,'bill'))}</dd><dt>Business proof</dt><dd>${ic('file')} ${esc(d.doc)}</dd></dl></div>
+  <p class="sm mut">Questions? Call the sales desk on 0281-555-0142 (Mon–Sat, 9:30 am – 6:30 pm).</p>
+  <div class="acts">${pend?'':`<button class="btn pri" onclick="reapply()">Correct details and re-apply</button>`}<button class="btn" onclick="logout()">${ic('out')}Sign out</button></div>
+  ${pend?`<div class="demo" style="margin-top:20px"><b>Prototype tip</b> — to see this dealer approved, sign out, sign in as <b>Admin</b>, open <b>Dealers</b> and approve “${esc(d.biz)}”.</div>`:''}`)}
+function reapply(){const d=me();FM.reg=Object.assign({},d,{re:d.id,same:d.bill==d.ship,pwd:'',pwd2:'',doc:''});go('/register')}
+
+function vForgot(){FM.fg=FM.fg||{};return auth(`<p class="crumb"><a href="#/login">‹ Back to sign in</a></p><h1>Forgot your password?</h1><p class="mut">Enter the email address you registered with. We will send you a link to set a new password.</p>
+  <form onsubmit="return doForgot()" novalidate>${fld('fg','email','Email address',{req:1})}<button class="btn pri block" type="submit">Send reset link</button></form>`)}
+function doForgot(){const em=(FM.fg.email||'').trim().toLowerCase();if(!RX.email.test(em)){ER.fg={email:'Enter a valid email address, e.g. name@business.in.'};render();return false}S.resetEmail=em;FM.fg={};go('/forgot/sent');return false}
+function vForgotSent(){if(!S.resetEmail){go('/forgot');return null}return auth(`<div class="big-ic" style="background:var(--pri-l);color:var(--pri)">${ic('info')}</div><h1>Check your email</h1>
+  <p>If an account exists for <b>${esc(S.resetEmail)}</b>, we have sent a link to set a new password. The link is valid for 30 minutes.</p>
+  <p class="mut">Did not receive it? Check your spam folder or <a href="#/forgot">try another email address</a>.</p>
+  <div class="demo" style="margin:16px 0"><b>Prototype shortcut</b> — no real email is sent. <a href="#/reset">Open the reset link</a> to continue.</div>
+  <a class="btn" href="#/login">Back to sign in</a>`)}
+function vReset(){FM.rs=FM.rs||{};return auth(`<h1>Set a new password</h1><p class="mut">${S.resetEmail?'For '+esc(S.resetEmail)+'. ':''}Choose a password you have not used before.</p>
+  <form onsubmit="return doReset()" novalidate>${fld('rs','pwd','New password',{req:1,type:'password',hint:'At least 8 characters, with a letter and a number'})}${fld('rs','pwd2','Confirm new password',{req:1,type:'password'})}<button class="btn pri block" type="submit">Save new password</button></form>`)}
+function doReset(){const f=FM.rs,e={};if(!RX.pwd.test(f.pwd||''))e.pwd='Password must be at least 8 characters and include a letter and a number.';if(!f.pwd2||f.pwd2!==f.pwd)e.pwd2='The two passwords do not match.';
+  if(Object.keys(e).length){ER.rs=e;render();return false}
+  const a=S.dealers.find(d=>d.email==S.resetEmail)||S.staff.find(s=>s.email==S.resetEmail);if(a)a.pwd=f.pwd;FM.rs={};go('/reset/done');return false}
+function vResetDone(){return auth(`<div class="big-ic" style="background:var(--ok-l);color:var(--ok)">${ic('check')}</div><h1>Password updated</h1><p>Your password has been changed. Please sign in with your new password.</p><a class="btn pri" href="#/login">Go to sign in</a>`)}
+function v404(){const b=empty('search','Page not found','The page you are looking for does not exist or has been moved.',`<a class="btn pri" href="#${S.user?HOME[S.user.role]:'/login'}">${S.user?'Go to dashboard':'Go to sign in'}</a>`);
+  return S.user&&(S.user.role!='dealer'||me().status=='Approved')?shell('',`<div class="card">${b}</div>`):auth(b)}
+
+/* ============ DEALER SCREENS ============ */
+function vDash(){const d=me(),os=myOrders(),act=os.filter(o=>si(o)>=0&&si(o)<5),lt=act[0],yr=os.filter(o=>o.status!='Cancelled');
+  return shell('dashboard',head('Welcome, '+esc(d.contact.split(' ')[0]),`${esc(d.biz)} · Dealer ID ${d.id} · ${d.city}, ${d.state}`,`<a class="btn pri" href="#/d/catalogue">${ic('box')}Browse catalogue</a>`)+
+  `<div class="g4">${kpi('Active orders',act.length,'View all orders','/d/orders')}${kpi('In production',os.filter(o=>o.status=='In Production').length,'Being manufactured','/d/orders')}${kpi('On the way',os.filter(o=>o.status=='Dispatched').length,'Dispatched to you','/d/orders')}${kpi('Total ordered this year',inr(yr.reduce((a,o)=>a+sum(o.items).total,0)),yr.length+' orders, incl. GST')}</div>
+  <div class="g2"><div>
+  <div class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><h2>Latest active order</h2>${lt?`<a href="#/d/order/${lt.id}">View order ${lt.id} ›</a>`:''}</div>
+  ${lt?`<p class="mut" style="margin-bottom:4px">${lt.id} · placed ${lt.date} · ${nf(sum(lt.items).pcs)} pieces · ${inr(sum(lt.items).total)}${lt.eta?' · <b>'+lt.eta+'</b>':''}</p>${tracker(lt)}`:empty('box','No active orders','Orders you place will appear here with live status.',`<a class="btn pri" href="#/d/catalogue">Browse catalogue</a>`)}</div>
+  <div class="card np"><div class="ch"><h2>Recent orders</h2><a href="#/d/orders">All orders ›</a></div>${os.length?ordersTable(os.slice(0,5),'dealer'):empty('list','You have no orders yet.','Browse the catalogue to place your first bulk order.',`<a class="btn pri" href="#/d/catalogue">Browse catalogue</a>`)}</div>
+  </div><div>
+  <div class="card"><h2>My Order</h2>${S.cart.length?`<p>${S.cart.length} product line${S.cart.length>1?'s':''} · ${nf(cartItems().reduce((a,i)=>a+i.qty,0))} pieces waiting to be submitted.</p><a class="btn pri block" href="#/d/cart">Review and submit</a>`:`<p class="mut">Nothing added yet. Add products from the catalogue to start a bulk order.</p><a class="btn block" href="#/d/catalogue">Start an order</a>`}</div>
+  <div class="card"><h2>Good to know</h2><p>${ic('info')} All approved dealers see the same standard dealer price, per piece, <b>exclusive of GST</b>.</p><p>${ic('info')} Orders are placed in full cartons and must meet each product’s minimum order quantity (MOQ).</p><p style="margin:0">${ic('info')} ${PAYNOTE}</p></div>
+  <div class="card"><h2>Sales desk</h2><p style="margin:0">0281-555-0142<br><span class="mut">Mon–Sat, 9:30 am – 6:30 pm</span><br>orders@hydrokraftglc.in</p></div>
+  </div></div>`)}
+
+function vCatalogue(){const c=U.cat=U.cat||{q:'',cap:'',wall:'',av:'',sort:'name'},q=c.q.trim().toLowerCase();
+  let l=S.products.filter(p=>(!q||(p.name+' '+p.sku).toLowerCase().includes(q))&&(!c.cap||p.cap==c.cap)&&(!c.wall||p.wall==c.wall)&&(!c.av||p.avail==c.av));
+  l.sort((a,b)=>c.sort=='plow'?a.price-b.price:c.sort=='phigh'?b.price-a.price:a.name.localeCompare(b.name));
+  const sel=(k,lab,opts)=>`<div class="field"><label for="cat_${k}">${lab}</label><select id="cat_${k}" onchange="U.cat.${k}=this.value;render()">${opts.map(o=>`<option value="${o[0]}" ${c[k]==o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>`;
+  const caps=[...new Set(S.products.map(p=>p.cap))].sort((a,b)=>a-b);
+  const read=S.user.role=='sales';
+  return shell(read?'products':'catalogue',head(read?'Products':'Product catalogue',`Standard dealer prices per piece, exclusive of GST. ${l.length} of ${S.products.length} products shown.`,read?`<a class="btn pri" href="#/s/new">${ic('plus')}Create order for a dealer</a>`:'')+
+  `<div class="card"><div class="fbar" style="margin:0"><div class="field grow"><label for="cat_q">Search</label><input type="text" id="cat_q" placeholder="Product name or SKU" value="${esc(c.q)}" oninput="U.cat.q=this.value;render()"></div>
+  ${sel('cap','Capacity',[['','All capacities']].concat(caps.map(x=>[x,capL(x)])))}${sel('wall','Construction',[['','All'],['Single Wall','Single Wall'],['Double Wall','Double Wall']])}${sel('av','Availability',[['','All']].concat(AVAIL.map(a=>[a,a])))}${sel('sort','Sort by',[['name','Name (A–Z)'],['plow','Price: low to high'],['phigh','Price: high to low']])}
+  <button class="btn" onclick="U.cat=null;render()">Clear</button></div></div>
+  ${l.length?`<div class="pgrid">${l.map(p=>`<${read?'div class="pc"':`a class="pc" href="#/d/product/${p.id}"`}>${ph(p,p.colors[0])}<div class="bd">
+  <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><div class="nm">${esc(p.name)}</div><div class="sm mut">SKU ${esc(p.sku)}</div></div>${avBadge(p.avail)}</div>
+  <div><span class="price num">${inr(p.price)}</span> <span class="mut sm">/ piece + ${p.gst}% GST</span></div>
+  <div>${p.colors.map(k=>`<span class="sw" style="background:${COL[k][1]}" title="${COL[k][0]}"></span>`).join(' ')} <span class="sm mut">${p.colors.length} colour${p.colors.length>1?'s':''}</span></div>
+  <div class="specs"><span>Capacity <b>${capL(p.cap)}</b></span><span>${p.wall}</span><span>Grade <b>${p.grade}</b></span><span>MOQ <b>${p.moq} pcs</b></span><span>Carton <b>${p.carton} pcs</b></span><span>${p.avail=='Limited Stock'?nf(p.stock)+' pcs left':''}</span></div>
+  ${read?'':`<span class="btn ${p.avail=='Out of Stock'?'':'pri'} block" style="margin-top:auto">${p.avail=='Out of Stock'?'View details':'View and order'}</span>`}</div></${read?'div':'a'}>`).join('')}</div>`
+  :`<div class="card">${empty('search','No products match your search.','Try a different name, SKU or filter.',`<button class="btn pri" onclick="U.cat=null;render()">Clear filters</button>`)}</div>`}`)}
+
+function vProduct(pid){const p=P(pid);if(!p)return v404();
+  if(!U.pd||U.pd.pid!=pid)U.pd={pid,color:p.colors[0],qty:String(p.moq),touched:false,added:null};
+  const s=U.pd,oos=p.avail=='Out of Stock',ex=S.cart.find(c=>c.pid==p.id&&c.color==s.color),e=s.touched?qtyErr(p,s.qty,ex?ex.qty:0):'',q=/^\d+$/.test(s.qty)?+s.qty:0,sub=q*p.price;
+  return shell('catalogue',crumb([['Product catalogue','/d/catalogue'],[esc(p.name)]])+
+  `<div class="pd"><div>${ph(p,s.color,1)}</div><div>
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap"><div><h1>${esc(p.name)}</h1><p class="mut">SKU ${esc(p.sku)}-${s.color} · ${capL(p.cap)} · ${p.wall} · ${p.grade}</p></div>${avBadge(p.avail)}</div>
+  <div class="card"><div class="bigprice num">${inr(p.price)} <span class="sm mut" style="font-weight:400">per piece, excl. GST</span></div>
+  <p class="mut" style="margin:4px 0 0">GST @ ${p.gst}% extra · ${inr(p.price*(1+p.gst/100))} per piece incl. GST · Standard dealer price for all approved dealers</p></div>
+  <p>${esc(p.desc)}</p>
+  ${p.avail=='Limited Stock'?alertBox('warn',`<b>Limited stock:</b> ${nf(p.stock)} pieces available for immediate dispatch.`):p.avail=='Made to Order'?alertBox('info','<b>Made to order:</b> produced after your order is confirmed. Allow 15–20 working days before dispatch.'):oos?alertBox('bad','<b>Out of stock:</b> this product cannot be ordered at the moment. Please check back later or call the sales desk for the next batch date.'):''}
+  <div class="card"><h2>Place a bulk order</h2>
+  <span class="lab" id="collab">Colour: ${COL[s.color][0]}</span><div class="cols" role="group" aria-labelledby="collab" style="margin-bottom:14px">${p.colors.map(k=>`<button class="colbtn ${k==s.color?'on':''}" aria-pressed="${k==s.color}" onclick="U.pd.color='${k}';U.pd.added=null;render()"><span class="sw" style="background:${COL[k][1]}"></span>${COL[k][0]}</button>`).join('')}</div>
+  <div class="field ${e?'err':''}" style="margin-bottom:10px"><label for="pd_qty">Quantity (pieces)</label><div class="qty"><button class="btn" aria-label="Remove one carton" ${oos?'disabled':''} onclick="stepQty(-1)">−</button><input type="text" inputmode="numeric" id="pd_qty" value="${esc(s.qty)}" ${oos?'readonly':''} oninput="U.pd.qty=this.value;U.pd.touched=true;U.pd.added=null;render()"><button class="btn" aria-label="Add one carton" ${oos?'disabled':''} onclick="stepQty(1)">+</button><span class="mut sm">+/− changes by one carton (${p.carton} pcs)</span></div>
+  ${e&&!oos?`<div class="msg">${ic('alert')} ${e}</div>`:`<div class="hint">MOQ ${p.moq} pieces · sold in full cartons of ${p.carton} pieces</div>`}</div>
+  <dl class="tot" style="max-width:360px;margin-bottom:14px"><dt>Cartons</dt><dd>${q&&!(q%p.carton)?q/p.carton:'—'}</dd><dt>Line total (excl. GST)</dt><dd>${inr(sub)}</dd><dt>GST @ ${p.gst}%</dt><dd>${inr(sub*p.gst/100)}</dd><dt class="fin">Line value incl. GST</dt><dd class="fin">${inr(sub*(1+p.gst/100))}</dd></dl>
+  ${s.added?alertBox('ok',`<b>Added to your order:</b> ${nf(s.added.q)} × ${esc(p.name)} (${COL[s.added.c][0]}). <a href="#/d/cart"><b>Go to My Order</b></a> or keep adding products.`):''}
+  <div class="acts"><button class="btn pri" ${oos?'disabled':''} onclick="addToOrder()">${ic('plus')}Add to order</button><a class="btn" href="#/d/catalogue">Back to catalogue</a>${S.cart.length?`<a class="btn ghost" href="#/d/cart">My Order (${S.cart.length})</a>`:''}</div></div>
+  <div class="card"><h2>Specifications</h2><dl class="dl"><dt>Product / model</dt><dd>${esc(p.name)}</dd><dt>Product code (SKU)</dt><dd>${esc(p.sku)}-${s.color}</dd><dt>Capacity</dt><dd>${capL(p.cap)}</dd><dt>Construction</dt><dd>${p.wall}${p.wall=='Double Wall'?' (vacuum insulated)':' (not insulated)'}</dd><dt>Steel grade</dt><dd>${p.grade}</dd><dt>Available colours</dt><dd>${p.colors.map(k=>COL[k][0]).join(', ')}</dd><dt>Dealer price</dt><dd>${inr(p.price)} per piece, excl. GST</dd><dt>GST</dt><dd>${p.gst}% charged extra</dd><dt>Minimum order (MOQ)</dt><dd>${p.moq} pieces</dd><dt>Pieces per carton</dt><dd>${p.carton}</dd><dt>Availability</dt><dd>${p.avail}</dd></dl></div>
+  </div></div>`)}
+function stepQty(n){const s=U.pd,p=P(s.pid);let q=/^\d+$/.test(s.qty)?+s.qty:p.moq;q=Math.round(q/p.carton)*p.carton+n*p.carton;s.qty=String(Math.max(p.moq,q));s.touched=true;s.added=null;render()}
+function addToOrder(){const s=U.pd,p=P(s.pid),ex=S.cart.find(c=>c.pid==p.id&&c.color==s.color);s.touched=true;
+  if(qtyErr(p,s.qty,ex?ex.qty:0)){s.added=null;render();return}
+  if(ex)ex.qty+=+s.qty;else S.cart.push({pid:p.id,color:s.color,qty:+s.qty});
+  s.added={q:+s.qty,c:s.color};s.touched=false;toast('Added to your order: '+s.qty+' × '+p.name);render()}
+
+const cartItems=()=>S.cart.map(c=>mkItem(c.pid,c.color,c.qty));
+const cartErr=c=>qtyErr(P(c.pid),c.qty);
+function linesTable(items,o){o=o||{};return `<div class="tw"><table class="t"><thead><tr><th>Product</th><th>SKU</th><th>Colour</th><th class="r">Quantity</th>${o.noPrice?'<th class="r">Cartons</th>':'<th class="r">Unit price</th><th class="r">Line total</th>'}${o.edit?'<th></th>':''}</tr></thead><tbody>
+  ${items.map((i,n)=>{const er=o.edit?cartErr(S.cart[n]):'';return `<tr><td><b>${esc(i.name)}</b><div class="sm mut">${capL(i.cap)} · carton of ${i.carton}</div></td><td class="nw">${esc(i.sku)}</td><td class="nw"><span class="sw" style="background:${COL[i.color][1]}"></span> ${COL[i.color][0]}</td>
+  <td class="r num">${o.edit?`<label class="sr" for="cq${n}">Quantity for ${esc(i.name)}</label><input type="text" inputmode="numeric" class="qin" id="cq${n}" value="${esc(i.qty)}" onchange="S.cart[${n}].qty=/^\\d+$/.test(this.value.trim())?+this.value:this.value;render()"> pcs${er?`<div class="msg" style="color:var(--bad);font-size:12.5px;font-weight:600">${ic('alert')} ${er}</div>`:`<div class="sm mut">${i.qty/i.carton} cartons</div>`}`:nf(i.qty)+' pcs'}</td>
+  ${o.noPrice?`<td class="r num">${nf(i.qty/i.carton)}</td>`:`<td class="r num">${inr(i.price)}</td><td class="r num b">${inr(i.qty*i.price)}</td>`}${o.edit?`<td class="r"><button class="btn s danger" onclick="S.cart.splice(${n},1);render()">Remove</button></td>`:''}</tr>`}).join('')}</tbody></table></div>`}
+function vCart(){const bad=S.cart.some(cartErr),items=cartItems().map(i=>Object.assign(i,{qty:+i.qty||0})),t=sum(items);
+  return shell('cart',head('My Order','Check quantities, then continue to review and submit.',`<a class="btn" href="#/d/catalogue">${ic('plus')}Add more products</a>`)+
+  (S.cart.length?`<div class="g2"><div class="card np">${linesTable(cartItems(),{edit:1})}</div>
+  <div class="card"><h2>Order summary</h2>${totBox(t)}${bad?alertBox('bad','Please correct the quantities marked in the list before continuing.'):''}
+  <div style="margin-top:14px"><button class="btn pri block" ${bad?'disabled':''} onclick="go('/d/review')">Continue to review</button></div><p class="sm mut" style="margin:10px 0 0">No online payment is taken. ${PAYNOTE}</p></div></div>`
+  :`<div class="card">${empty('cart','Your order is empty.','Add products from the catalogue to build a bulk order.',`<a class="btn pri" href="#/d/catalogue">Browse catalogue</a>`)}</div>`))}
+function vReview(){if(!S.cart.length||S.cart.some(cartErr)){go('/d/cart');return null}
+  const d=me(),r=U.rev=U.rev||{addr:'ship',other:'',po:'',notes:'',fail:false,err:false},t=sum(cartItems()),e=ER.rev||{};FM.rev=r;
+  const opt=(k,lab,txt)=>`<label class="chk"><input type="radio" name="addr" ${r.addr==k?'checked':''} onchange="U.rev.addr='${k}';render()"><span><b>${lab}</b>${txt?'<br><span class="mut">'+esc(txt)+'</span>':''}</span></label>`;
+  return shell('cart',crumb([['My Order','/d/cart'],['Review order']])+head('Review and submit order','Please check everything before submitting. You can still go back and change quantities.')+
+  (r.err?alertBox('bad',`<b>We could not submit your order.</b> The connection to our order system was interrupted. Nothing has been lost — your order is saved exactly as shown below. Please press “Submit order” again. If the problem continues, call the sales desk on 0281-555-0142.`):'')+
+  `<div class="g2"><div><div class="card np"><div class="ch"><h2>Products (${S.cart.length})</h2><a href="#/d/cart">Edit quantities</a></div>${linesTable(cartItems())}</div>
+  <div class="card"><fieldset><legend>Shipping address</legend>${opt('ship','Registered shipping address',addrOf(d,'ship'))}${d.bill!=d.ship?opt('bill','Billing address',addrOf(d,'bill')):''}${opt('other','Deliver to a different address','')}
+  ${r.addr=='other'?fld('rev','other','Full delivery address with PIN code',{req:1,area:1,rows:3}):''}</fieldset>
+  <div class="f2 sect">${fld('rev','po','Your purchase order reference',{opt:1,ph:'e.g. SH/PO/26-27/120'})}${fld('rev','notes','Notes for our team',{opt:1,ph:'e.g. preferred transporter, delivery timing'})}</div></div></div>
+  <div><div class="card"><h2>Order summary</h2>${totBox(t)}
+  <div class="alert info" style="margin:14px 0">${ic('info')}<div><b>No online payment.</b> ${PAYNOTE}</div></div>
+  <button class="btn pri block" onclick="submitOrder()">${ic('check')}Submit order</button><a class="btn block" style="margin-top:8px" href="#/d/cart">Back to My Order</a></div>
+  <div class="demo"><b>Prototype control</b><label class="chk" style="margin:6px 0 0;font-weight:400"><input type="checkbox" ${r.fail?'checked':''} onchange="U.rev.fail=this.checked">Simulate a submission failure on the next attempt (to view the error state)</label></div></div></div>`)}
+function submitOrder(){const r=U.rev,d=me();if(r.addr=='other'&&!(r.other||'').trim()){ER.rev={other:'Enter the delivery address, or choose your registered address.'};render();return}
+  if(r.fail){r.fail=false;r.err=true;ER={};render();window.scrollTo(0,0);return}
+  const o=newOrder(d.id,cartItems(),{shipTo:r.addr=='other'?r.other.trim():addrOf(d,r.addr),po:r.po.trim(),notes:r.notes.trim(),by:d.contact+' (Dealer)'});
+  S.cart=[];U.rev=null;go('/d/confirm/'+o.id)}
+function newOrder(did,items,x){const o=Object.assign({id:'ORD-'+S.nextOrd++,dealerId:did,date:TODAY,items,status:'Order Placed',hist:[],shipTo:addrOf(D(did),'ship'),po:'',notes:'',by:'',dispatch:null,cancel:null,eta:''},x);o.hist=[{s:'Order Placed',d:TODAY,by:o.by,note:''}];S.orders.unshift(o);return o}
+function confirmBody(o,role){const t=sum(o.items),d=D(o.dealerId),b=PRE[role];
+  return `<div class="card" style="border-top:3px solid var(--ok)"><div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap"><div class="big-ic" style="background:var(--ok-l);color:var(--ok);margin:0">${ic('check')}</div><div style="flex:1;min-width:240px"><h1>${role=='sales'?'Order created for '+esc(d.biz):'Order submitted successfully'}</h1>
+  <p class="mut" style="margin:4px 0 0">Order number <b style="color:var(--text)">${o.id}</b> · ${o.date} · Status: ${badge(o.status)}</p></div></div></div>
+  <div class="g2"><div><div class="card np"><div class="ch"><h2>Order summary</h2></div>${linesTable(o.items)}</div>
+  <div class="card"><h2>What happens next</h2><ol style="margin:0;padding-left:20px"><li>${CO} reviews the order and marks it <b>Confirmed</b>.</li><li>The factory produces and packs the goods (<b>In Production</b> → <b>Ready for Dispatch</b>).</li><li>The goods are <b>Dispatched</b> with the transporter and LR number shown on the order.</li><li>The order is marked <b>Delivered</b> once received.</li></ol></div></div>
+  <div><div class="card"><h2>Order value</h2>${totBox(t)}</div><div class="card"><h3>Ship to</h3><p>${esc(d.biz)}<br><span class="mut">${esc(o.shipTo)}</span></p><div class="alert info" style="margin:0">${ic('info')}<div>${PAYNOTE}</div></div></div>
+  <div class="acts"><a class="btn pri" href="#${b}/order/${o.id}">View order and tracking</a><a class="btn" href="#${role=='sales'?'/s/new':'/d/catalogue'}">${role=='sales'?'Create another order':'Back to catalogue'}</a></div></div></div>`}
+function vConfirm(id){const o=O(id);if(!o||o.dealerId!=S.user.id)return v404();return shell('orders',confirmBody(o,'dealer'))}
+
+function vProfile(){const d=me();if(!FM.prof||FM.prof.id!=d.id)FM.prof=Object.assign({},d);const n=Object.keys(ER.prof||{}).length;
+  return shell('profile',head('Account','Your business and contact details.')+(n?alertBox('bad',`<b>Your changes were not saved.</b> Please correct ${n} field${n>1?'s':''} below.`):'')+
+  `<div class="g2"><form class="card" onsubmit="return saveProfile()" novalidate><fieldset><legend>Contact person</legend><div class="f3">${fld('prof','contact','Contact person name',{req:1})}${fld('prof','mobile','Mobile number',{req:1,max:10,num:1})}${fld('prof','email','Email address',{req:1})}</div></fieldset>
+  <fieldset class="sect"><legend>Addresses</legend>${fld('prof','bill','Billing address',{req:1,area:1})}${fld('prof','ship','Shipping address',{req:1,area:1})}<div class="f3">${fld('prof','city','City',{req:1})}${fld('prof','state','State',{req:1,opts:STATES})}${fld('prof','pin','PIN code',{req:1,max:6,num:1})}</div></fieldset>
+  <div class="acts sect"><button class="btn pri" type="submit">Save changes</button><button class="btn" type="button" onclick="FM.prof=null;ER={};render()">Discard changes</button></div></form>
+  <div><div class="card"><h2>Registered business</h2><dl class="dl" style="grid-template-columns:110px 1fr"><dt>Business</dt><dd>${esc(d.biz)}</dd><dt>Dealer ID</dt><dd>${d.id}</dd><dt>Type</dt><dd>${d.type}</dd><dt>GSTIN</dt><dd>${d.gstin}</dd><dt>PAN</dt><dd>${d.pan||'Not provided'}</dd><dt>Status</dt><dd>${dBadge(d.status)}</dd><dt>Approved on</dt><dd>${d.decided}</dd></dl>
+  <p class="sm mut" style="margin:12px 0 0">${ic('lock')} These details were verified at approval. To change them, please contact the sales desk on 0281-555-0142.</p></div></div></div>`)}
+function saveProfile(){const f=FM.prof,e={},t=k=>(f[k]||'').trim();
+  if(!t('contact'))e.contact='Enter the contact person’s name.';if(!RX.mobile.test(t('mobile')))e.mobile='Enter a valid 10-digit mobile number.';
+  if(!RX.email.test(t('email')))e.email='Enter a valid email address.';else if(S.dealers.some(d=>d.email==t('email').toLowerCase()&&d.id!=f.id))e.email='This email address is used by another account.';
+  if(!t('bill'))e.bill='Enter your billing address.';if(!t('ship'))e.ship='Enter your shipping address.';if(!t('city'))e.city='Enter your city.';if(!f.state)e.state='Select your state.';if(!RX.pin.test(t('pin')))e.pin='Enter a 6-digit PIN code.';
+  if(Object.keys(e).length){ER.prof=e;render();window.scrollTo(0,0);return false}
+  Object.assign(me(),{contact:t('contact'),mobile:t('mobile'),email:t('email').toLowerCase(),bill:t('bill'),ship:t('ship'),city:t('city'),state:f.state,pin:t('pin')});S.user.id=f.id;FM.prof=null;ER={};toast('Your account details have been saved.');render();return false}
+
+/* ============ SHARED: ORDERS ============ */
+const who=()=>{const s=S.staff.find(x=>x.email==S.user.id);return s.name+' ('+s.title+')'};
+const DESC=['The order has been received and is waiting for confirmation by '+CO+'.','The order is confirmed and queued for production.','The goods are being manufactured and packed.','The goods are packed and waiting for the transporter.','The goods have left the factory and are on the way.','The goods have been delivered.'];
+function tracker(o){const c=o.status=='Cancelled',i=c?0:si(o),all=o.status=='Delivered';
+  return `<ol class="trk" aria-label="Order progress">${STAGES.map((s,k)=>{const h=o.hist.find(x=>x.s==s),st=c?(k==0?'done':'todo'):(k<i||all?'done':k==i?'cur':'todo');
+  return `<li class="${st}"><span class="dot">${st=='done'?ic('check'):k+1}</span><span class="lbl">${s}</span><span class="dt">${st=='todo'?(c?'Not reached':'Pending'):h?h.d:''}<span class="sr">${st=='done'?' (completed)':''}</span></span>${st=='cur'?'<span><span class="now">Current stage</span></span>':''}</li>`}).join('')}</ol>`}
+function ordersTable(l,role){const b=PRE[role],int=role!='dealer',fac=role=='factory';
+  return `<div class="tw"><table class="t"><thead><tr><th>Order no.</th><th>Date</th>${int?'<th>Dealer</th>':''}<th>Items</th>${fac?'<th class="r">Pieces</th><th class="r">Cartons</th>':'<th class="r">Order value</th>'}<th>Status</th><th></th></tr></thead><tbody>
+  ${l.map(o=>{const t=sum(o.items),d=D(o.dealerId);return `<tr class="lnk" onclick="go('${b}/order/${o.id}')"><td class="nw"><a href="#${b}/order/${o.id}" onclick="event.stopPropagation()"><b>${o.id}</b></a></td><td class="nw">${o.date}</td>${int?`<td>${esc(d.biz)}<div class="sm mut">${esc(d.city)}</div></td>`:''}
+  <td>${o.items.length} product${o.items.length>1?'s':''}<div class="sm mut">${esc(o.items.map(i=>i.name).join(', '))}</div></td>${fac?`<td class="r num">${nf(t.pcs)}</td><td class="r num">${nf(t.ctn)}</td>`:`<td class="r num"><b>${inr(t.total)}</b><div class="sm mut">${nf(t.pcs)} pcs</div></td>`}<td>${badge(o.status)}</td><td class="r"><span class="btn s">View</span></td></tr>`}).join('')}</tbody></table></div>`}
+function vOrders(arg){const role=S.user.role;if(arg!=null){U.ol={q:'',st:STAGES[arg]||''};go(PRE[role]+'/orders');return null}
+  const f=U.ol=U.ol||{q:'',st:''},all=role=='dealer'?myOrders():sortO(S.orders),q=f.q.trim().toLowerCase();
+  const l=all.filter(o=>(!f.st||o.status==f.st)&&(!q||(o.id+' '+D(o.dealerId).biz+' '+o.items.map(i=>i.name+' '+i.sku).join(' ')).toLowerCase().includes(q)));
+  const chip=(v,lab)=>`<button class="chip ${f.st==v?'on':''}" aria-pressed="${f.st==v}" onclick="U.ol.st='${v}';render()">${lab}<span class="n">${v?all.filter(o=>o.status==v).length:all.length}</span></button>`;
+  return shell('orders',head('Orders',role=='dealer'?'Every order placed by your business, newest first.':role=='sales'?'All dealer orders (view only).':'All dealer orders, newest first.',role=='dealer'?`<a class="btn pri" href="#/d/catalogue">${ic('plus')}Place a new order</a>`:role=='sales'?`<a class="btn pri" href="#/s/new">${ic('plus')}Create order for a dealer</a>`:'')+
+  (all.length?`<div class="chips" role="group" aria-label="Filter by status">${chip('','All')}${STAGES.map(s=>chip(s,s)).join('')}${chip('Cancelled','Cancelled')}</div>
+  <div class="fbar"><div class="field grow"><label for="ol_q">Search orders</label><input type="text" id="ol_q" placeholder="${role=='dealer'?'Order number or product':'Order number, dealer or product'}" value="${esc(f.q)}" oninput="U.ol.q=this.value;render()"></div></div>
+  <div class="card np">${l.length?ordersTable(l,role):empty('search','No orders match your filters.','Try another status or search term.',`<button class="btn pri" onclick="U.ol=null;render()">Clear filters</button>`)}</div>`
+  :`<div class="card">${empty('list','You have no orders yet.','When you place your first bulk order it will appear here, with live status tracking.',`<a class="btn pri" href="#/d/catalogue">Browse catalogue</a>`)}</div>`))}
+function vOrder(id){const role=S.user.role,o=O(id);if(!o||(role=='dealer'&&o.dealerId!=S.user.id)||(role=='factory'&&si(o)<1))return v404();
+  const d=D(o.dealerId),t=sum(o.items),fac=role=='factory',b=PRE[role],can=o.status=='Cancelled',i=si(o);
+  const back=fac?(o.status=='Delivered'?['Completed','/f/completed']:['Production queue','/f/dashboard']):['Orders',b+'/orders'];
+  const panel=role=='admin'?adminPanel(o):fac?facPanel(o):role=='sales'?`<div class="card"><h2>Status updates</h2><p class="mut" style="margin:0">${ic('lock')} Sales Team can view this order. Status is updated by Admin and Factory / Dispatch.</p></div>`:
+    `<div class="card"><h2>Need a change?</h2><p class="mut" style="margin:0">To change or cancel this order, call the sales desk on 0281-555-0142 and quote <b>${o.id}</b>.</p></div>`;
+  return shell(fac&&o.status=='Delivered'?'completed':fac?'dashboard':'orders',crumb([back,[o.id]])+head('Order '+o.id,`Placed on ${o.date} by ${esc(o.by)}${role!='dealer'?' · '+esc(d.biz):''}`,badge(o.status))+
+  (can?alertBox('bad',`<b>This order was cancelled on ${o.cancel.d}.</b><br>Reason: ${esc(o.cancel.reason)}`):'')+
+  `<div class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><h2>Order progress</h2>${o.eta&&!can&&i<5?`<span class="b">${ic('clock')} ${o.eta}</span>`:''}</div>
+  ${can?'':`<p style="margin-bottom:12px"><b>Current status: ${o.status}.</b> <span class="mut">${DESC[i]}</span></p>`}${tracker(o)}</div>
+  <div class="g2"><div><div class="card np"><div class="ch"><h2>Products (${o.items.length})</h2><span class="mut sm">${nf(t.pcs)} pieces · ${nf(t.ctn)} cartons</span></div>${linesTable(o.items,{noPrice:fac})}</div>
+  ${fac?'':`<div class="card" style="max-width:460px;margin-left:auto">${totBox(t)}</div>`}
+  <div class="card"><h2>Status history</h2><ul class="tl">${o.hist.slice().reverse().map(h=>`<li><b>${h.s}</b> <span class="mut">· ${h.d}</span><div class="sm mut">Updated by ${esc(h.by)}${h.note?' — “'+esc(h.note)+'”':''}</div></li>`).join('')}${can?`<li style="order:-1"><b>Cancelled</b> <span class="mut">· ${o.cancel.d}</span><div class="sm mut">By ${esc(o.cancel.by)}</div></li>`:''}</ul></div></div>
+  <div>${can?'':panel}
+  <div class="card"><h2>Delivery</h2><dl class="dl" style="grid-template-columns:110px 1fr"><dt>Dealer</dt><dd>${role=='admin'||role=='sales'?`<a href="#${b}/dealer/${d.id}">${esc(d.biz)}</a>`:esc(d.biz)}</dd><dt>Ship to</dt><dd>${esc(o.shipTo)}</dd>${role!='dealer'?`<dt>Contact</dt><dd>${esc(d.contact)} · ${d.mobile}</dd>`:''}
+  <dt>Transporter</dt><dd>${o.dispatch?esc(o.dispatch.tr):'<span class="mut">Shown after dispatch</span>'}</dd><dt>LR number</dt><dd>${o.dispatch?esc(o.dispatch.lr):'<span class="mut">Shown after dispatch</span>'}</dd></dl>
+  ${o.dispatch?`<p class="sm mut" style="margin:10px 0 0">Quote the LR number to the transporter for consignment enquiries.</p>`:''}</div>
+  <div class="card"><h2>Order information</h2><dl class="dl" style="grid-template-columns:110px 1fr"><dt>Placed by</dt><dd>${esc(o.by)}</dd><dt>Dealer PO ref.</dt><dd>${o.po?esc(o.po):'<span class="mut">None</span>'}</dd><dt>Notes</dt><dd>${o.notes?esc(o.notes):'<span class="mut">None</span>'}</dd></dl>
+  ${fac?'':`<p class="sm mut" style="margin:10px 0 0">${ic('info')} ${PAYNOTE}</p>`}</div></div></div>`)}
+function setStatus(o,st,by,note){const i=STAGES.indexOf(st);o.hist=o.hist.filter(h=>STAGES.indexOf(h.s)<=i);
+  for(let k=0;k<=i;k++)if(!o.hist.find(h=>h.s==STAGES[k]))o.hist.push({s:STAGES[k],d:TODAY,by,note:''});
+  if(note)o.hist.find(h=>h.s==st).note=note;if(i<4)o.dispatch=null;if(i==5)o.eta='';o.status=st}
+function adminPanel(o){const i=si(o);if(!U.as||U.as.id!=o.id)U.as={id:o.id,st:STAGES[Math.min(i+1,5)],note:'',tr:o.dispatch?o.dispatch.tr:'',lr:o.dispatch?o.dispatch.lr:''};
+  const a=FM.as=U.as,need=STAGES.indexOf(a.st)>=4;
+  return `<div class="card" style="border-top:3px solid var(--pri)"><h2>Update order status</h2><div class="field"><label for="as_st">Set status to</label><select id="as_st" onchange="U.as.st=this.value;render()">${STAGES.map(s=>`<option ${s==a.st?'selected':''}>${s}</option>`).join('')}</select><div class="hint">Current status: ${o.status}</div></div>
+  ${need?fld('as','tr','Transporter name',{req:1})+fld('as','lr','LR / consignment number',{req:1}):''}${fld('as','note','Note',{opt:1,ph:'Shown in the status history'})}
+  <button class="btn pri block" onclick="saveStatus()">Save status</button>
+  ${i<=1?`<button class="btn danger block" style="margin-top:8px" onclick="reasonModal('Cancel order ${o.id}?','The order will be closed and the dealer will see the reason you enter.','Reason for cancellation','Cancel order','doCancel(\\'${o.id}\\')')">Cancel / reject order</button><p class="hint">Orders can be cancelled until production starts.</p>`:''}</div>`}
+function saveStatus(){const a=U.as,o=O(a.id),e={},i=STAGES.indexOf(a.st);
+  if(i>=4){if(!a.tr.trim())e.tr='Enter the transporter name.';if(!a.lr.trim())e.lr='Enter the LR / consignment number.'}
+  if(Object.keys(e).length){ER.as=e;render();return}
+  if(a.st==o.status&&!a.note.trim()&&(i<4||(o.dispatch&&o.dispatch.tr==a.tr&&o.dispatch.lr==a.lr))){toast('No change — the order is already at '+o.status+'.');return}
+  setStatus(o,a.st,who(),a.note.trim());if(i>=4)o.dispatch={tr:a.tr.trim(),lr:a.lr.trim()};U.as=null;ER={};toast('Order '+o.id+' updated to '+a.st+'.');render()}
+function reasonModal(title,text,label,btn,fn){FM.rm={r:''};modal(`<h2>${title}</h2><p>${text}</p><div class="field" id="rmf"><label for="rm_r">${label}<span class="req"> *</span></label><textarea id="rm_r" rows="3" oninput="FM.rm.r=this.value"></textarea><div class="msg" id="rm_e" style="display:none">${ic('alert')} Please enter a reason.</div></div><div class="mfoot"><button class="btn" onclick="closeModal()">Go back</button><button class="btn pri" style="background:var(--bad);border-color:var(--bad)" onclick="${fn}">${btn}</button></div>`)}
+function rmVal(){const r=FM.rm.r.trim();if(!r){$('#rm_e').style.display='block';$('#rmf').classList.add('err');$('#rm_r').focus()}return r}
+function doCancel(id){const r=rmVal();if(!r)return;const o=O(id);o.status='Cancelled';o.cancel={reason:r,d:TODAY,by:who()};closeModal();toast('Order '+id+' has been cancelled.');render()}
+const NEXT={'Confirmed':['In Production','Start production','Press when the factory begins manufacturing this order.'],'In Production':['Ready for Dispatch','Mark ready for dispatch','Press when all cartons are packed and counted.'],'Ready for Dispatch':['Dispatched','Mark as dispatched','Enter the transporter details and press when the goods leave the factory.'],'Dispatched':['Delivered','Mark as delivered','Press when the dealer or transporter confirms delivery.']};
+function facPanel(o){const nx=NEXT[o.status];if(!nx)return `<div class="card"><h2>Completed</h2><p class="mut" style="margin:0">${ic('check')} This order has been delivered. No further action is needed.</p></div>`;
+  const disp=nx[0]=='Dispatched';if(disp&&(!FM.fd||FM.fd.id!=o.id))FM.fd={id:o.id,tr:'',lr:''};
+  return `<div class="card" style="border-top:3px solid var(--pri)"><h2>Next step</h2><p>${nx[2]}</p>${disp?fld('fd','tr','Transporter name',{req:1,ph:'e.g. Girnar Roadways'})+fld('fd','lr','LR / consignment number',{req:1,ph:'e.g. GR-558213'}):''}
+  <button class="btn pri block" onclick="facNext('${o.id}')">${ic(disp?'truck':'check')}${nx[1]}</button><p class="hint">Status after this step: ${nx[0]}</p></div>`}
+function facNext(id){const o=O(id),nx=NEXT[o.status];if(nx[0]=='Dispatched'){const f=FM.fd,e={};if(!f.tr.trim())e.tr='Enter the transporter name.';if(!f.lr.trim())e.lr='Enter the LR / consignment number.';if(Object.keys(e).length){ER.fd=e;render();return}}
+  setStatus(o,nx[0],who(),'');if(nx[0]=='Dispatched'){o.dispatch={tr:FM.fd.tr.trim(),lr:FM.fd.lr.trim()};FM.fd=null}ER={};toast('Order '+id+' is now '+nx[0]+'.');render()}
+
+/* ============ ADMIN ============ */
+function vAdminDash(){const pend=S.dealers.filter(d=>d.status=='Pending'),c=s=>S.orders.filter(o=>o.status==s).length,np=sortO(S.orders.filter(o=>o.status=='Order Placed')),sw=S.products.filter(p=>p.avail=='Limited Stock'||p.avail=='Out of Stock');
+  return shell('dashboard',head('Admin dashboard','Today, '+TODAY)+`<div class="g4">${kpi('Dealer registrations to review',pend.length,'Review now ›','/a/dealers/Pending')}${kpi('Orders awaiting confirmation',c('Order Placed'),'Confirm orders ›','/a/orders/0')}${kpi('Orders in production',c('In Production'),'View ›','/a/orders/2')}${kpi('Ready for dispatch',c('Ready for Dispatch'),'View ›','/a/orders/3')}</div>
+  <div class="g2"><div><div class="card np"><div class="ch"><h2>Orders awaiting confirmation</h2><a href="#/a/orders">All orders ›</a></div>${np.length?ordersTable(np,'admin'):empty('check','No orders are waiting for confirmation.','New dealer orders will appear here.')}</div>
+  <div class="card np"><div class="ch"><h2>Pending dealer registrations</h2><a href="#/a/dealers/Pending">All pending ›</a></div>${pend.length?dealersTable(pend,'admin'):empty('users','No registrations are waiting for review.','New dealer applications will appear here.')}</div></div>
+  <div><div class="card np"><div class="ch"><h2>Stock watch</h2><a href="#/a/products">Products ›</a></div>${sw.length?`<table class="t"><tbody>${sw.map(p=>`<tr><td><a href="#/a/product/${p.id}"><b>${esc(p.name)}</b></a><div class="sm mut">${p.sku}${p.avail=='Limited Stock'?' · '+nf(p.stock)+' pcs left':''}</div></td><td class="r">${avBadge(p.avail)}</td></tr>`).join('')}</tbody></table>`:empty('check','All products are in stock.','')}</div>
+  <div class="card"><h2>Shortcuts</h2><div class="acts"><a class="btn" href="#/a/product/new">${ic('plus')}Add product</a><a class="btn" href="#/a/dealers/All">${ic('users')}All dealers</a></div></div></div></div>`)}
+function dealersTable(l,role){const b=PRE[role];return `<div class="tw"><table class="t"><thead><tr><th>Business</th><th>Contact</th><th>Location</th><th>Type</th><th>GSTIN</th><th>Applied</th><th>Status</th><th></th></tr></thead><tbody>${l.map(d=>`<tr class="lnk" onclick="go('${b}/dealer/${d.id}')"><td><a href="#${b}/dealer/${d.id}" onclick="event.stopPropagation()"><b>${esc(d.biz)}</b></a><div class="sm mut">${d.id}</div></td><td>${esc(d.contact)}<div class="sm mut">${d.mobile}</div></td><td>${esc(d.city)}<div class="sm mut">${d.state}</div></td><td>${d.type}</td><td class="nw">${d.gstin}</td><td class="nw">${d.applied}</td><td>${dBadge(d.status)}</td><td class="r"><span class="btn s">${role=='admin'&&d.status=='Pending'?'Review':'View'}</span></td></tr>`).join('')}</tbody></table></div>`}
+function vDealers(arg){const role=S.user.role;if(arg!=null){U.dl={q:'',tab:arg};go(PRE[role]+'/dealers');return null}
+  const f=U.dl=U.dl||{q:'',tab:role=='admin'?'Pending':'Approved'},q=f.q.trim().toLowerCase();
+  const l=S.dealers.filter(d=>(f.tab=='All'||d.status==f.tab)&&(!q||(d.biz+' '+d.contact+' '+d.city+' '+d.gstin+' '+d.id).toLowerCase().includes(q)));
+  const chip=t=>`<button class="chip ${f.tab==t?'on':''}" aria-pressed="${f.tab==t}" onclick="U.dl.tab='${t}';render()">${t=='Pending'?'Pending approval':t}<span class="n">${t=='All'?S.dealers.length:S.dealers.filter(d=>d.status==t).length}</span></button>`;
+  return shell('dealers',head('Dealers',role=='admin'?'Review registrations and view dealer details.':'Dealer directory (view only).')+`<div class="chips" role="group" aria-label="Filter dealers">${['Pending','Approved','Rejected','All'].map(chip).join('')}</div>
+  <div class="fbar"><div class="field grow"><label for="dl_q">Search dealers</label><input type="text" id="dl_q" placeholder="Business, contact, city or GSTIN" value="${esc(f.q)}" oninput="U.dl.q=this.value;render()"></div></div>
+  <div class="card np">${l.length?dealersTable(l,role):f.tab=='Pending'&&!q?empty('check','No registrations are waiting for review.','You are all caught up.'):empty('users','No dealers found.','Try another tab or search term.',`<button class="btn pri" onclick="U.dl=null;render()">Clear filters</button>`)}</div>`)}
+function vDealer(id){const role=S.user.role,d=D(id),b=PRE[role];if(!d)return v404();const adm=role=='admin',os=sortO(S.orders.filter(o=>o.dealerId==id));
+  const dec=d.status=='Pending'?`<div class="card" style="border-top:3px solid var(--acc)"><h2>Decision required</h2><p>Check the GSTIN against the uploaded certificate, then approve or reject this application.</p><button class="btn pri block" onclick="approve('${id}')">${ic('check')}Approve dealer</button><button class="btn danger block" style="margin-top:8px" onclick="askReject('${id}')">${ic('x')}Reject application</button></div>`
+    :d.status=='Rejected'?`<div class="card"><h2>Application rejected</h2><p class="mut">Rejected on ${d.decided}</p><p><b>Reason shown to the dealer:</b><br>${esc(d.reason)}</p><button class="btn block" onclick="approve('${id}')">Approve this dealer instead</button></div>`
+    :`<div class="card"><h2>Approved dealer</h2><p class="mut" style="margin:0">${ic('check')} Approved on ${d.decided}. This dealer can sign in, see dealer prices and place orders.</p></div>`;
+  return shell('dealers',crumb([['Dealers',b+'/dealers'],[esc(d.biz)]])+head(esc(d.biz),`${d.id} · ${d.type} · Applied on ${d.applied}`,dBadge(d.status)+(role=='sales'&&d.status=='Approved'?`<a class="btn pri" href="#/s/new/${id}">${ic('plus')}Create order for this dealer</a>`:''))+
+  `<div class="g2"><div><div class="card"><h2>Business details</h2><dl class="dl"><dt>Business name</dt><dd>${esc(d.biz)}</dd><dt>Business type</dt><dd>${d.type}</dd><dt>GSTIN</dt><dd>${d.gstin}</dd><dt>PAN</dt><dd>${d.pan||'<span class="mut">Not provided</span>'}</dd><dt>Contact person</dt><dd>${esc(d.contact)}</dd><dt>Mobile number</dt><dd>${d.mobile}</dd><dt>Email address</dt><dd>${esc(d.email)}</dd><dt>Billing address</dt><dd>${esc(addrOf(d,'bill'))}</dd><dt>Shipping address</dt><dd>${esc(addrOf(d,'ship'))}</dd></dl></div>
+  ${d.status=='Approved'?`<div class="card np"><div class="ch"><h2>Orders from this dealer (${os.length})</h2></div>${os.length?ordersTable(os,role):empty('list','No orders yet.','This dealer has not placed an order.')}</div>`:''}</div>
+  <div>${adm?dec:`<div class="card"><h2>Status</h2><p style="margin:0">${dBadge(d.status)}</p><p class="sm mut" style="margin:8px 0 0">Dealer approval is handled by Admin.</p></div>`}
+  ${adm?`<div class="card"><h2>Business proof</h2><p>${ic('file')} <b>${esc(d.doc)}</b><br><span class="mut sm">Uploaded with the application on ${d.applied}</span></p><button class="btn block" onclick="showDoc('${id}')">View document</button></div>`:''}</div></div>`)}
+function showDoc(id){const d=D(id);modal(`<h2>${esc(d.doc)}</h2><div class="ph" style="border:1px solid var(--line);border-radius:6px;padding:40px 16px;min-height:220px;justify-content:center">${ic('file')}<figcaption style="font-size:13px">Document preview placeholder: scanned GST registration certificate for <b>${esc(d.biz)}</b>, GSTIN ${d.gstin}, ${esc(d.city)}, ${d.state}</figcaption></div><div class="mfoot"><button class="btn pri" onclick="closeModal()">Close</button></div>`)}
+function approve(id){const d=D(id);d.status='Approved';d.decided=TODAY;d.reason='';toast(d.biz+' approved. The dealer can now sign in and order.');render()}
+function askReject(id){reasonModal('Reject this application?','The dealer will see this reason when they sign in, and can correct their details and re-apply.','Reason for rejection','Reject application',`doReject('${id}')`)}
+function doReject(id){const r=rmVal();if(!r)return;const d=D(id);d.status='Rejected';d.decided=TODAY;d.reason=r;closeModal();toast(d.biz+' rejected.');render()}
+
+function vProducts(){const f=U.pl=U.pl||{q:''},q=f.q.trim().toLowerCase(),l=S.products.filter(p=>!q||(p.name+' '+p.sku).toLowerCase().includes(q));
+  return shell('products',head('Products','Changes to price and availability are visible to dealers immediately.',`<a class="btn pri" href="#/a/product/new">${ic('plus')}Add product</a>`)+
+  `<div class="fbar"><div class="field grow"><label for="pl_q">Search products</label><input type="text" id="pl_q" placeholder="Product name or SKU" value="${esc(f.q)}" oninput="U.pl.q=this.value;render()"></div></div>
+  <div class="card np">${l.length?`<div class="tw"><table class="t"><thead><tr><th>Product</th><th>SKU</th><th>Capacity</th><th>Construction</th><th>Grade</th><th class="r">Dealer price</th><th class="r">MOQ</th><th class="r">Carton</th><th>Availability</th><th></th></tr></thead><tbody>
+  ${l.map(p=>`<tr><td><a href="#/a/product/${p.id}"><b>${esc(p.name)}</b></a><div class="sm mut">${p.colors.length} colour${p.colors.length>1?'s':''}</div></td><td class="nw">${esc(p.sku)}</td><td class="nw">${capL(p.cap)}</td><td class="nw">${p.wall}</td><td class="nw">${p.grade}</td><td class="r num">${inr(p.price)}</td><td class="r num">${p.moq}</td><td class="r num">${p.carton}</td>
+  <td><label class="sr" for="av_${p.id}">Availability of ${esc(p.name)}</label><select id="av_${p.id}" style="min-width:150px" onchange="setAvail('${p.id}',this.value)">${AVAIL.map(a=>`<option ${a==p.avail?'selected':''}>${a}</option>`).join('')}</select></td><td class="r"><a class="btn s" href="#/a/product/${p.id}">${ic('edit')}Edit</a></td></tr>`).join('')}</tbody></table></div>`
+  :empty('search','No products found.','Try a different name or SKU.',`<button class="btn pri" onclick="U.pl=null;render()">Clear search</button>`)}</div>`)}
+function setAvail(id,v){const p=P(id);p.avail=v;if(v=='Limited Stock'&&!p.stock)p.stock=p.moq*5;toast(p.name+' is now marked '+v+'.');render()}
+function vProductForm(id){const isNew=id=='new',p=P(id);if(!isNew&&!p)return v404();
+  if(!FM.pf||FM.pf.key!=id)FM.pf=isNew?{key:id,name:'',sku:'',cap:'',wall:'',grade:'SS 304',colors:['STL'],price:'',gst:'18',moq:'',carton:'',avail:'In Stock',stock:'',desc:''}:Object.assign({},p,{key:id,colors:p.colors.slice(),stock:p.stock||''});
+  const f=FM.pf,er=ER.pf||{},n=Object.keys(er).length;
+  return shell('products',crumb([['Products','/a/products'],[isNew?'Add product':esc(p.name)]])+head(isNew?'Add product':'Edit product',isNew?'New products appear in the dealer catalogue as soon as they are saved.':'SKU '+esc(p.sku))+
+  (n?alertBox('bad',`<b>The product was not saved.</b> Please correct ${n} field${n>1?'s':''} below.`):'')+
+  `<form onsubmit="return saveProduct()" novalidate><div class="g2"><div class="card"><fieldset><legend>Product information</legend><div class="f2">${fld('pf','name','Product / model name',{req:1,ph:'e.g. ThermoPro 750'})}${fld('pf','sku','Product code (SKU)',{req:1,ph:'e.g. DW-304-750',hint:'The colour code is added automatically'})}</div>
+  <div class="f3">${fld('pf','cap','Capacity (ml)',{req:1,num:1,hint:'Enter 1000 for 1 litre'})}${fld('pf','wall','Construction',{req:1,opts:['Single Wall','Double Wall']})}${fld('pf','grade','Steel grade',{req:1,opts:['SS 304','SS 202','SS 316']})}</div>
+  <div class="field ${er.colors?'err':''}"><span class="lab">Available colours<span class="req"> *</span></span><div class="cols">${Object.keys(COL).map(k=>`<label class="colbtn"><input type="checkbox" style="width:16px;height:16px;accent-color:var(--pri)" ${f.colors.includes(k)?'checked':''} onchange="togCol('${k}',this.checked)"><span class="sw" style="background:${COL[k][1]}"></span>${COL[k][0]}</label>`).join('')}</div>${er.colors?`<div class="msg">${ic('alert')} ${er.colors}</div>`:''}</div>
+  ${fld('pf','desc','Short description',{req:1,area:1,rows:3})}</fieldset>
+  <fieldset class="sect"><legend>Price and order rules</legend><div class="f2">${fld('pf','price','Dealer price per piece (₹, excl. GST)',{req:1,num:1,hint:'One standard price for all approved dealers'})}${fld('pf','gst','GST rate (%)',{req:1,num:1})}${fld('pf','moq','Minimum order quantity (pieces)',{req:1,num:1})}${fld('pf','carton','Pieces per carton',{req:1,num:1})}</div></fieldset>
+  <fieldset class="sect"><legend>Stock and availability</legend><div class="f2">${fld('pf','avail','Availability',{req:1,opts:AVAIL})}${fld('pf','stock','Pieces available',{num:1,hint:'Required only for Limited Stock'})}</div></fieldset>
+  <div class="acts sect"><button class="btn pri" type="submit">${isNew?'Save product':'Save changes'}</button><a class="btn" href="#/a/products">Cancel</a></div></div>
+  <div class="card"><h2>Product photo</h2>${ph({name:f.name||'New product',cap:+f.cap||750,wall:f.wall||'Double Wall'},f.colors[0]||'STL',1)}<button type="button" class="btn block" style="margin-top:12px" onclick="toast('Photo upload is represented by this placeholder in the prototype.')">Replace photo</button><p class="hint">JPG or PNG, square, at least 800 × 800 px.</p></div></div></form>`)}
+function togCol(k,on){const c=FM.pf.colors,i=c.indexOf(k);if(on&&i<0)c.push(k);if(!on&&i>=0)c.splice(i,1)}
+function saveProduct(){const f=FM.pf,e={},t=k=>String(f[k]==null?'':f[k]).trim(),pos=k=>/^\d+(\.\d+)?$/.test(t(k))&&+t(k)>0,isNew=f.key=='new';
+  if(!t('name'))e.name='Enter the product name.';
+  if(!t('sku'))e.sku='Enter the product code (SKU).';else if(S.products.some(p=>p.sku.toLowerCase()==t('sku').toLowerCase()&&p.id!=f.key))e.sku='Another product already uses this SKU.';
+  if(!pos('cap'))e.cap='Enter the capacity in ml, e.g. 750.';if(!f.wall)e.wall='Select the construction.';if(!f.grade)e.grade='Select the steel grade.';
+  if(!f.colors.length)e.colors='Select at least one colour.';if(!t('desc'))e.desc='Enter a short description.';
+  if(!pos('price'))e.price='Enter a price greater than 0.';if(!/^\d+(\.\d+)?$/.test(t('gst')))e.gst='Enter the GST rate, e.g. 18.';
+  if(!pos('carton')||+t('carton')%1)e.carton='Enter the number of pieces per carton.';
+  if(!pos('moq')||+t('moq')%1)e.moq='Enter the minimum order quantity.';else if(!e.carton&&+t('moq')%+t('carton'))e.moq='MOQ must be a multiple of the carton size ('+t('carton')+').';
+  if(!f.avail)e.avail='Select the availability.';if(f.avail=='Limited Stock'&&!pos('stock'))e.stock='Enter how many pieces are available.';
+  if(Object.keys(e).length){ER.pf=e;render();window.scrollTo(0,0);return false}
+  const rec={name:t('name'),sku:t('sku').toUpperCase(),cap:+t('cap'),wall:f.wall,grade:f.grade,colors:f.colors.slice(),price:+t('price'),gst:+t('gst'),moq:+t('moq'),carton:+t('carton'),avail:f.avail,stock:f.avail=='Limited Stock'?+t('stock'):null,desc:t('desc')};
+  if(isNew)S.products.push(Object.assign({id:'p'+(S.products.length+1)},rec));else Object.assign(P(f.key),rec);
+  FM.pf=null;toast(rec.name+(isNew?' added to the catalogue.':' saved.'));go('/a/products');return false}
+
+/* ============ SALES ============ */
+function vSalesDash(){const os=sortO(S.orders),mine=os.filter(o=>o.by.includes('Sales Team')),c=s=>os.filter(o=>o.status==s).length;
+  return shell('dashboard',head('Sales dashboard','Today, '+TODAY,`<a class="btn pri" href="#/s/new">${ic('plus')}Create order for a dealer</a>`)+
+  `<div class="g4">${kpi('Approved dealers',S.dealers.filter(d=>d.status=='Approved').length,'View dealers ›','/s/dealers/Approved')}${kpi('Orders placed by Sales Team',mine.length,'On behalf of dealers')}${kpi('Awaiting confirmation',c('Order Placed'),'View ›','/s/orders/0')}${kpi('Open orders',os.filter(o=>si(o)>=0&&si(o)<5).length,'All orders ›','/s/orders')}</div>
+  <div class="g2"><div class="card np"><div class="ch"><h2>Recent orders</h2><a href="#/s/orders">All orders ›</a></div>${ordersTable(os.slice(0,6),'sales')}</div>
+  <div><div class="card"><h2>Take a phone order</h2><p class="mut">Choose an approved dealer, add products and quantities, and submit the order on their behalf.</p><a class="btn pri block" href="#/s/new">Create order for a dealer</a></div>
+  <div class="card"><h2>Your access</h2><p class="mut" style="margin:0">${ic('lock')} Sales Team can view dealers, orders and products, and create orders. Approvals, product changes and status updates are handled by Admin and Factory / Dispatch.</p></div></div></div>`)}
+const soNew=()=>({step:1,dealer:'',q:'',items:[],row:{},err:{},po:'',notes:''});
+const soRow=pid=>U.so.row[pid]||(U.so.row[pid]={c:P(pid).colors[0],q:''});
+const soItems=()=>U.so.items.map(i=>mkItem(i.pid,i.color,i.qty));
+function vSalesNew(arg){if(arg){const a=D(arg);U.so=soNew();if(a&&a.status=='Approved'){U.so.dealer=arg;U.so.step=2}go('/s/new');return null}
+  const s=FM.so=U.so=U.so||soNew(),d=D(s.dealer),t=sum(soItems());
+  const steps=`<ol class="steps">${['Select dealer','Add products','Review and submit'].map((x,i)=>`<li class="${s.step==i+1?'on':s.step>i+1?'dn':''}" ${s.step==i+1?'aria-current="step"':''}><i>${s.step>i+1?ic('check'):i+1}</i>${x}</li>`).join('')}</ol>`;
+  let body;
+  if(s.step==1){const q=s.q.trim().toLowerCase(),l=S.dealers.filter(x=>x.status=='Approved'&&(!q||(x.biz+' '+x.contact+' '+x.city).toLowerCase().includes(q)));
+    body=`<div class="fbar"><div class="field grow"><label for="so_q">Search approved dealers</label><input type="text" id="so_q" placeholder="Business, contact or city" value="${esc(s.q)}" oninput="U.so.q=this.value;render()"></div></div>
+    <div class="card np">${l.length?`<div class="tw"><table class="t"><thead><tr><th>Business</th><th>Contact</th><th>Location</th><th>Type</th><th></th></tr></thead><tbody>${l.map(x=>`<tr><td><b>${esc(x.biz)}</b><div class="sm mut">${x.id} · ${x.gstin}</div></td><td>${esc(x.contact)}<div class="sm mut">${x.mobile}</div></td><td>${esc(x.city)}, ${x.state}</td><td>${x.type}</td><td class="r"><button class="btn s pri" onclick="U.so.dealer='${x.id}';U.so.step=2;render();window.scrollTo(0,0)">Select dealer</button></td></tr>`).join('')}</tbody></table></div>`:empty('users','No dealers found.','Only approved dealers can be selected.',`<button class="btn pri" onclick="U.so.q='';render()">Clear search</button>`)}</div>`}
+  else if(s.step==2){body=`<div class="alert info">${ic('users')}<div>Ordering for <b>${esc(d.biz)}</b> · ${esc(d.city)}, ${d.state} · ${esc(d.contact)} ${d.mobile} — <a href="#/s/new" onclick="U.so.step=1;render();return false">Change dealer</a></div></div>
+    <div class="g2"><div class="card np"><div class="ch"><h2>Products</h2><span class="mut sm">Standard dealer price, excl. GST</span></div><div class="tw"><table class="t"><thead><tr><th>Product</th><th class="r">Price</th><th>MOQ / carton</th><th>Availability</th><th>Colour</th><th>Qty (pcs)</th><th></th></tr></thead><tbody>
+    ${S.products.map(p=>{const r=soRow(p.id),oos=p.avail=='Out of Stock',e=s.err[p.id];return `<tr><td><b>${esc(p.name)}</b><div class="sm mut">${p.sku} · ${capL(p.cap)} · ${p.wall}</div></td><td class="r num nw">${inr(p.price)}</td><td class="nw">${p.moq} / ${p.carton}</td><td>${avBadge(p.avail)}${p.avail=='Limited Stock'?`<div class="sm mut">${nf(p.stock)} pcs left</div>`:''}</td>
+    <td><label class="sr" for="so_c_${p.id}">Colour for ${esc(p.name)}</label><select id="so_c_${p.id}" style="min-width:130px" ${oos?'disabled':''} onchange="soRow('${p.id}').c=this.value">${p.colors.map(k=>`<option value="${k}" ${r.c==k?'selected':''}>${COL[k][0]}</option>`).join('')}</select></td>
+    <td><label class="sr" for="so_n_${p.id}">Quantity for ${esc(p.name)}</label><input type="text" inputmode="numeric" class="qin" id="so_n_${p.id}" value="${esc(r.q)}" placeholder="${p.moq}" ${oos?'disabled':''} oninput="soRow('${p.id}').q=this.value" onkeydown="if(event.key=='Enter')soAdd('${p.id}')">${e?`<div class="sm b" style="color:var(--bad);max-width:190px">${ic('alert')} ${e}</div>`:''}</td>
+    <td class="r"><button class="btn s" ${oos?'disabled':''} onclick="soAdd('${p.id}')">Add</button></td></tr>`}).join('')}</tbody></table></div></div>
+    <div class="card"><h2>Order for ${esc(d.biz)}</h2>${s.items.length?`<table class="t" style="margin:0 -4px 12px"><tbody>${soItems().map((i,n)=>`<tr><td style="padding-left:4px"><b>${esc(i.name)}</b><div class="sm mut">${COL[i.color][0]} · ${nf(i.qty)} pcs × ${inr(i.price)}</div></td><td class="r num b">${inr(i.qty*i.price)}</td><td class="r" style="padding-right:4px"><button class="btn s danger" aria-label="Remove ${esc(i.name)}" onclick="U.so.items.splice(${n},1);render()">${ic('x')}</button></td></tr>`).join('')}</tbody></table>${totBox(t)}<button class="btn pri block" style="margin-top:14px" onclick="U.so.step=3;render();window.scrollTo(0,0)">Continue to review</button>`
+    :empty('cart','No products added yet.','Choose a colour, enter a quantity and press Add.')}</div></div>`}
+  else{body=`<div class="g2"><div><div class="card np"><div class="ch"><h2>Products (${s.items.length})</h2><a href="#/s/new" onclick="U.so.step=2;render();return false">Edit products</a></div>${linesTable(soItems())}</div>
+    <div class="card"><div class="f2">${fld('so','po','Dealer purchase order reference',{opt:1})}${fld('so','notes','Notes',{opt:1,ph:'e.g. order taken by phone'})}</div></div></div>
+    <div><div class="card"><h2>Dealer and delivery</h2><p><b>${esc(d.biz)}</b><br>${esc(d.contact)} · ${d.mobile}<br><span class="mut">Ship to: ${esc(addrOf(d,'ship'))}</span></p></div>
+    <div class="card"><h2>Order summary</h2>${totBox(t)}<div class="alert info" style="margin:14px 0">${ic('info')}<div><b>No online payment.</b> ${PAYNOTE}</div></div><button class="btn pri block" onclick="soSubmit()">${ic('check')}Submit order for dealer</button><button class="btn block" style="margin-top:8px" onclick="U.so.step=2;render()">Back</button></div></div></div>`}
+  return shell('new',head('Create order for a dealer','Place an order on behalf of an approved dealer. It will appear in the dealer’s own order list.',s.step>1||s.items.length?`<button class="btn" onclick="U.so=null;render()">Start over</button>`:'')+steps+body)}
+function soAdd(pid){const s=U.so,p=P(pid),r=soRow(pid),ex=s.items.find(i=>i.pid==pid&&i.color==r.c),e=qtyErr(p,r.q,ex?ex.qty:0);
+  if(e){s.err[pid]=e;render();return}
+  if(ex)ex.qty+=+r.q;else s.items.push({pid,color:r.c,qty:+r.q});delete s.err[pid];toast('Added: '+r.q+' × '+p.name);r.q='';render()}
+function soSubmit(){const s=U.so,o=newOrder(s.dealer,soItems(),{po:s.po.trim(),notes:s.notes.trim(),by:who()});U.so=null;go('/s/confirm/'+o.id)}
+function vSalesConfirm(id){const o=O(id);return o?shell('new',confirmBody(o,'sales')):v404()}
+
+/* ============ FACTORY / DISPATCH ============ */
+const FQ=['Confirmed','In Production','Ready for Dispatch','Dispatched'];
+function vFactory(arg){if(arg!=null){U.fq=FQ[arg]||FQ[0];go('/f/dashboard');return null}
+  const tab=U.fq=U.fq||'Confirmed',by=s=>sortO(S.orders.filter(o=>o.status==s)).reverse(),l=by(tab),lab=['To start','In production','Ready for dispatch','Dispatched (in transit)'];
+  return shell('dashboard',head('Production queue','Confirmed orders, oldest first. Open an order to update its stage.')+
+  `<div class="g4">${FQ.map((s,i)=>kpi(lab[i],by(s).length,i==0?'Confirmed, waiting for production ›':'View ›','/f/dashboard/'+i)).join('')}</div>
+  <div class="chips" role="group" aria-label="Stage">${FQ.map(s=>`<button class="chip ${s==tab?'on':''}" aria-pressed="${s==tab}" onclick="U.fq='${s}';render()">${s}<span class="n">${by(s).length}</span></button>`).join('')}</div>
+  <div class="card np">${l.length?ordersTable(l,'factory'):empty('check','No orders at this stage.','Orders will appear here as they move through production and dispatch.')}</div>`)}
+function vReq(){const m={};S.orders.filter(o=>o.status=='Confirmed'||o.status=='In Production').forEach(o=>o.items.forEach(i=>{const r=m[i.sku]||(m[i.sku]={i,qty:0,ords:[],prod:0});r.qty+=i.qty;r.ords.push(o.id);if(o.status=='In Production')r.prod+=i.qty}));
+  const l=Object.values(m).sort((a,b)=>a.i.sku.localeCompare(b.i.sku));
+  return shell('requirements',head('Production requirements','Total quantities needed across orders that are Confirmed or In Production.')+
+  `<div class="card np">${l.length?`<div class="tw"><table class="t"><thead><tr><th>Product</th><th>SKU</th><th>Colour</th><th class="r">Pieces required</th><th class="r">Cartons</th><th class="r">Already in production</th><th>Orders</th></tr></thead><tbody>${l.map(r=>`<tr><td><b>${esc(r.i.name)}</b><div class="sm mut">${capL(r.i.cap)}</div></td><td class="nw">${esc(r.i.sku)}</td><td class="nw"><span class="sw" style="background:${COL[r.i.color][1]}"></span> ${COL[r.i.color][0]}</td><td class="r num b">${nf(r.qty)}</td><td class="r num">${nf(Math.ceil(r.qty/r.i.carton))}</td><td class="r num">${nf(r.prod)}</td><td>${r.ords.map(id=>`<a href="#/f/order/${id}">${id}</a>`).join(', ')}</td></tr>`).join('')}</tbody>
+  <tfoot><tr><td colspan="3">Total</td><td class="r num">${nf(l.reduce((a,r)=>a+r.qty,0))}</td><td class="r num">${nf(l.reduce((a,r)=>a+Math.ceil(r.qty/r.i.carton),0))}</td><td class="r num">${nf(l.reduce((a,r)=>a+r.prod,0))}</td><td></td></tr></tfoot></table></div>`:empty('check','Nothing is waiting for production.','Confirmed orders will be listed here by product and colour.')}</div>`)}
+function vDone(){const l=sortO(S.orders.filter(o=>o.status=='Delivered'));return shell('completed',head('Completed orders','Orders that have been delivered.')+`<div class="card np">${l.length?ordersTable(l,'factory'):empty('truck','No delivered orders yet.','Orders appear here once they are marked delivered.')}</div>`)}
+
+/* ============ ROUTER ============ */
+const R={'login':vLogin,'register':vRegister,'register/submitted':vRegDone,'status':vStatus,'forgot':vForgot,'forgot/sent':vForgotSent,'reset':vReset,'reset/done':vResetDone,
+  'd/dashboard':vDash,'d/catalogue':vCatalogue,'d/product':vProduct,'d/cart':vCart,'d/review':vReview,'d/confirm':vConfirm,'d/orders':vOrders,'d/order':vOrder,'d/profile':vProfile,
+  'a/dashboard':vAdminDash,'a/dealers':vDealers,'a/dealer':vDealer,'a/products':vProducts,'a/product':vProductForm,'a/orders':vOrders,'a/order':vOrder,
+  's/dashboard':vSalesDash,'s/new':vSalesNew,'s/confirm':vSalesConfirm,'s/dealers':vDealers,'s/dealer':vDealer,'s/orders':vOrders,'s/order':vOrder,'s/products':vCatalogue,
+  'f/dashboard':vFactory,'f/requirements':vReq,'f/completed':vDone,'f/order':vOrder};
+function route(seg){const role={d:'dealer',a:'admin',s:'sales',f:'factory'}[seg[0]];
+  if(role){if(!S.user){go('/login');return null}if(S.user.role!=role){go(HOME[S.user.role]);return null}if(role=='dealer'&&me().status!='Approved'){go('/status');return null}
+    const fn=R[seg[0]+'/'+seg[1]];return fn?fn(seg[2]):v404()}
+  if(seg[0]=='status'&&!me()){go('/login');return null}
+  const fn=R[seg.join('/')];return fn?fn():v404()}
+function render(){const ae=document.activeElement,fid=ae&&ae.id;let pos=null;try{pos=ae.selectionStart}catch(e){}
+  const html=route((location.hash.slice(1)||'/login').split('/').filter(Boolean));if(html==null)return;
+  $('#app').innerHTML=html;
+  if(fid){const el=document.getElementById(fid);if(el&&el.tagName!='MAIN'){el.focus();try{if(pos!=null)el.setSelectionRange(pos,pos)}catch(e){}}}
+  save()}
+window.addEventListener('hashchange',()=>{ER={};U.menu=false;closeModal();render();window.scrollTo(0,0)});
+if(!load())seed();
+render();
+</script>
+</body>
+</html>
