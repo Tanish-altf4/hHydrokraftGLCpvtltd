@@ -1,2 +1,2 @@
-# hHydrokraftGLCpvtltd
+# HydrokraftGLCpvtltd
 Website for hydrokraft 
